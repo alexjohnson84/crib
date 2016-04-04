@@ -23,10 +23,22 @@ def scorehand(ary):
 	for combo in combinations:
 		combo_sum = 0
 		for card in combo:
-			combo_sum += int(card[:-1])
+			combo_sum += int(value_map['numbers'][card[:-1]])
 		#if sum is 15, add 2 to current score
 		if combo_sum == 15:
 			current_score += 2
+	#check for pairs
+	for combo in combinations:
+		#skip if combo is not equal to 2, avoids duping
+		if(len(combo) != 2):
+			pass
+		else:
+			card_vals = [card[:-1] for card in combo]
+			pairs = set([x for x in card_vals if card_vals.count(x) == 2])
+			current_score += 2 * len(pairs)
+
+		
+
 	return current_score
 
 
@@ -35,4 +47,4 @@ def scorehand(ary):
 
 #print(generate_combos([1,2,3,4,5]))	
 #print(generate_combos(read_hand(test_hands,"fifteen","ex1")))
-#print(scorehand(read_hand(test_hands,"fifteen","ex2")))
+print(scorehand(read_hand(test_hands,"pair","ex2")))

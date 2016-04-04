@@ -23,6 +23,10 @@ class TestCrib(unittest.TestCase):
 		#iterate through examples
 		for example in list_examples(test_hands,"fifteen"):
 			self.assertEqual(scorehand(read_hand(test_hands,"fifteen",example)),2)
+	def test_pairs(self):
+		#iterate through examples
+		for example in list_examples(test_hands,"pair"):
+			self.assertEqual(scorehand(read_hand(test_hands,"pair",example)),2)
 
 if __name__ == '__main__':
     unittest.main()
