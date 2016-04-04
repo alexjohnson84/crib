@@ -11,6 +11,6 @@ def deck_init():
 	return deck
 	
 
-print(deck_init())
+#print(deck_init())
 #print(len(deck_init()))
 #print([list(x) for x in deck_init()])

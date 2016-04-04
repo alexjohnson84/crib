@@ -1,5 +1,6 @@
 import unittest
 from decktools import deck_init
+from cribtools import scorehand
 import json
 
 test_hands = json.load(open("test_files/test_hands.txt"))
@@ -21,7 +22,7 @@ class TestCrib(unittest.TestCase):
 	def test_fifteen(self):
 		#iterate through examples
 		for example in list_examples(test_hands,"fifteen"):
-			self.assertEqual(read_hand(test_hands,"fifteen",example),1)
+			self.assertEqual(scorehand(read_hand(test_hands,"fifteen",example)),2)
 
 if __name__ == '__main__':
     unittest.main()
