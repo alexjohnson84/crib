@@ -28,5 +28,19 @@ class TestCrib(unittest.TestCase):
 		for example in list_examples(test_hands,"pair"):
 			self.assertEqual(scorehand(read_hand(test_hands,"pair",example)),2)
 
+	def test_straight(self):
+		for example in list_examples(test_hands,"straight_3"):
+			self.assertEqual(scorehand(read_hand(test_hands,"straight_3",example)),3)
+		for example in list_examples(test_hands,"straight_4"):
+			self.assertEqual(scorehand(read_hand(test_hands,"straight_4",example)),4)
+		for example in list_examples(test_hands,"straight_5"):
+			self.assertEqual(scorehand(read_hand(test_hands,"straight_5",example)),5)
+	
+	def test_flush(self):
+		for example in list_examples(test_hands,"flush_4"):
+			self.assertEqual(scorehand(read_hand(test_hands,"flush_4",example)),4)
+		for example in list_examples(test_hands,"flush_5"):
+			self.assertEqual(scorehand(read_hand(test_hands,"flush_5",example)),5)
+
 if __name__ == '__main__':
     unittest.main()
