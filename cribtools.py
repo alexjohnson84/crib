@@ -5,11 +5,11 @@ import collections
 
 value_map = json.load(open("value_map.txt"))
 
-#TODO - Determine in helper function is needed
+#Helper function brought in for debugging
 test_hands = json.load(open("test_files/test_hands.txt"))
+
 def read_hand(hands,ptype,example):
 	return(eval(hands[ptype][example]))
-
 
 def generate_combos(ary):
 	output = []
@@ -17,9 +17,15 @@ def generate_combos(ary):
 		output.append(list(itertools.combinations(ary,i)))
 	return list(itertools.chain(*output))
 
-def scorehand(ary):
+def scorehand(ary, turn_up = ''):
+	#check for turn_up card - optional arg
+	if(turn_up != ''):
+		full_hand = ary + turn_up
+	else:
+		full_hand = ary
+	#initate variables
 	current_score = 0
-	combinations = generate_combos(ary)
+	combinations = generate_combos(full_hand)
 	#check for fifteens
 	for combo in combinations:
 		combo_sum = 0
@@ -48,17 +54,14 @@ def scorehand(ary):
 		if(len(combo) >= 3 and len(combo) >= longest_straight):
 			runtotal = (int(value_map['sequence'][card[:-1]]) for card in combo)
 			seq = sorted(list(runtotal))
-			#print(seq)
 			#determine if the cards are sequential
 			if((seq == list(range(seq[0], seq[-1]+1)))==True):
-				#print(combo)
 				all_long_straights.append(combo)
 				longest_straight = len(combo)
 				longest_straight_cards = combo
 	#count double & triple runs
 	equivalent_straights = [a for a in all_long_straights if len(a) == longest_straight]	
 	current_score += longest_straight * len(equivalent_straights)
-
 
 	#check for flush
 	largest_flush = 0
@@ -71,11 +74,11 @@ def scorehand(ary):
 	if(largest_flush >= 4):
 		current_score += largest_flush
 
-	#check for nobs - TODO
-
-
-		
-
+	#check for nobs
+	if(turn_up != ''):
+		suit_of_turnup = turn_up[-1]
+		if(('J' +  suit_of_turnup) in ary):
+			current_score += 1
 	return current_score
 
 
