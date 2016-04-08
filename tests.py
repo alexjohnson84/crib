@@ -12,8 +12,12 @@ def read_hand(hands,ptype,example):
 def list_examples(hands,ptype):
 	examps = list([k for k in hands[ptype].keys() if k[0:1] == "ex"])
 	return examps
-
-	#return(list(hands[ptype].keys()))
+def define_testcase(src, h_type,score, turn_up = False):
+	for example in list_examples(src,h_type):
+		if(turn_up == False):
+			self.assertEqual(scorehand(read_hand(src, h_type, example)),score)
+		if(turn_up == True):
+			self.assertEqual(scorehand(read_hand(src, h_type, example)), scorehand(read_hand(src, h_type, "turn_" + example)),score)
 
 class TestDeck(unittest.TestCase):
 	#test to see deck has 52 cards
@@ -21,44 +25,31 @@ class TestDeck(unittest.TestCase):
 		self.assertEqual(len(deck_init()),52)
 
 class TestCrib(unittest.TestCase):
-	#TODO - nuild an evaluate hand test on the "read hand function"
 	def test_fifteen(self):
-		#iterate through examples
-		for example in list_examples(test_hands,"fifteen"):
-			self.assertEqual(scorehand(read_hand(test_hands,"fifteen",example)),2)
+		define_testcase(test_hands, "fifteen",2)
+
 	def test_pairs(self):
-		#iterate through examples
-		for example in list_examples(test_hands,"pair"):
-			self.assertEqual(scorehand(read_hand(test_hands,"pair",example)),2)
+		define_testcase(test_hands, "pair",2)
 
 	def test_straight(self):
-		for example in list_examples(test_hands,"straight_3"):
-			self.assertEqual(scorehand(read_hand(test_hands,"straight_3",example)),3)
-		for example in list_examples(test_hands,"straight_4"):
-			self.assertEqual(scorehand(read_hand(test_hands,"straight_4",example)),4)
-		for example in list_examples(test_hands,"straight_5"):
-			self.assertEqual(scorehand(read_hand(test_hands,"straight_5",example)),5)
+		define_testcase(test_hands, "straight_3",3)
+		define_testcase(test_hands, "straight_4",4)
+		define_testcase(test_hands, "straight_5",5)
 
 	def test_flush(self):
-		for example in list_examples(test_hands,"flush_4"):
-			self.assertEqual(scorehand(read_hand(test_hands,"flush_4",example)),4)
-		for example in list_examples(test_hands,"flush_5"):
-			self.assertEqual(scorehand(read_hand(test_hands,"flush_5",example)),5)
+		define_testcase(test_hands, "flush_4",4)
+		define_testcase(test_hands, "flush_5",5)
+
 	def test_nobs(self):
-		for example in list_examples(test_hands,"nobs"):
-			self.assertEqual(scorehand(read_hand(test_hands,"nobs",example),read_hand(test_hands,"nobs","turn_"+ example)),1)		
+		define_testcase(test_hands, "nobs", 1, True)
 
 	def test_mixed_cases(self):
-		for example in list_examples(test_hands,"8 point"):
-			self.assertEqual(scorehand(read_hand(test_hands,"8 point",example)),8)
-		for example in list_examples(test_hands,"10 point"):
-			self.assertEqual(scorehand(read_hand(test_hands,"10 point",example)),10)
-		for example in list_examples(test_hands,"15 point"):
-			self.assertEqual(scorehand(read_hand(test_hands,"15 point",example)),15)
-		for example in list_examples(test_hands,"16 point"):
-			self.assertEqual(scorehand(read_hand(test_hands,"16 point",example)),16)
-		for example in list_examples(test_hands,"29 point"):
-			self.assertEqual(scorehand(read_hand(test_hands,"nobs",example),read_hand(test_hands,"29 point","turn_"+ example)),29)						
+		define_testcase(test_hands, "8 point",8)
+		define_testcase(test_hands, "10 point",10)
+		define_testcase(test_hands, "15 point",15)
+		define_testcase(test_hands, "16 point", 16)
+		define_testcase(test_hands, "29 point", 29, True)
+				
 
 if __name__ == '__main__':
     unittest.main()
