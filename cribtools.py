@@ -1,7 +1,7 @@
 from decktools import deck_init
 import json
 import itertools
-import collections
+
 
 value_map = json.load(open("value_map.txt"))
 
