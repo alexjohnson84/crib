@@ -1,9 +1,11 @@
 import unittest
-from decktools import deck_init
+from decktools import Decktools
 from cribtools import scorehand
 import json
 
 test_hands = json.load(open("test_files/test_hands.txt"))
+
+
 
 #read a hand from specific example
 def read_hand(hands,ptype,example):
@@ -21,8 +23,16 @@ def define_testcase(src, h_type,score, turn_up = False):
 
 class TestDeck(unittest.TestCase):
 	#test to see deck has 52 cards
-	def test_deck(self):
-		self.assertEqual(len(deck_init()),52)
+	def test_deck_length(self):
+		t_deck = Decktools()
+		self.assertEqual(len(t_deck.deck),52)
+	#test drawing and cutting functions
+	def test_draw(self):
+		t_deck = Decktools()
+		t_deck.draw_card()
+		self.assertEqual(len(t_deck.deck),51)
+		t_deck.cut_card()
+		self.assertEqual(len(t_deck.deck),50)
 
 class TestCrib(unittest.TestCase):
 	def test_fifteen(self):

@@ -1,4 +1,4 @@
-from decktools import deck_init
+#from decktools import deck_init
 import json
 import itertools
 
@@ -87,4 +87,4 @@ def scorehand(ary, turn_up = ''):
 
 #print(generate_combos([1,2,3,4,5]))	
 #print(generate_combos(read_hand(test_hands,"fifteen","ex1")))
-print(scorehand(read_hand(test_hands,"straight_4","ex1")))
+#print(scorehand(read_hand(test_hands,"straight_4","ex1")))

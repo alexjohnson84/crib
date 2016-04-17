@@ -1,4 +1,4 @@
-from decktools import deck_init
+#from decktools import deck_init
 import json
 import itertools
 
