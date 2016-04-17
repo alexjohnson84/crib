@@ -17,7 +17,8 @@ def generate_combos(ary):
 		output.append(list(itertools.combinations(ary,i)))
 	return list(itertools.chain(*output))
 
-def scorehand(ary, turn_up = ''):
+#todo - add ispeg methods
+def scorehand(ary, turn_up = '', ispeg = False):
 	#check for turn_up card - optional arg
 	if(turn_up != ''):
 		full_hand = ary + turn_up
@@ -71,15 +72,17 @@ def scorehand(ary, turn_up = ''):
 			current_flush = max([suits.count(a) for a in suits])
 			if(current_flush >= largest_flush):
 				largest_flush = current_flush
-	if(largest_flush >= 4):
+	if(largest_flush >= 4 and ispeg == True):
 		current_score += largest_flush
 
 	#check for nobs
-	if(turn_up != ''):
+	if(turn_up != '' and ispeg == True):
 		suit_of_turnup = turn_up[-1]
 		if(('J' +  suit_of_turnup) in ary):
 			current_score += 1
 	return current_score
+
+
 
 
 

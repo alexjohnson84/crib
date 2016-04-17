@@ -1,4 +1,5 @@
 import unittest
+from cribplay import TwoPlayerGame
 from decktools import Decktools
 from cribtools import scorehand
 import json
@@ -11,11 +12,11 @@ test_hands = json.load(open("test_files/test_hands.txt"))
 def read_hand(hands,ptype,example):
 	return(eval(hands[ptype][example]))
 #list examples from test hand file
-def list_examples(hands,ptype):
-	examps = list([k for k in hands[ptype].keys() if k[0:1] == "ex"])
+def list_examples(hands,scoretype,ptype):
+	examps = list([k for k in hands[scoretype][ptype].keys() if k[0:1] == "ex"])
 	return examps
 def define_testcase(src, h_type,score, turn_up = False):
-	for example in list_examples(src,h_type):
+	for example in list_examples(src, "handscore", h_type):
 		if(turn_up == False):
 			self.assertEqual(scorehand(read_hand(src, h_type, example)),score)
 		if(turn_up == True):
@@ -59,6 +60,28 @@ class TestCrib(unittest.TestCase):
 		define_testcase(test_hands, "15 point",15)
 		define_testcase(test_hands, "16 point", 16)
 		define_testcase(test_hands, "29 point", 29, True)
+
+class TestPeg(unittest.TestCase):
+	#todo - test pegging
+	def test_pegging(self):
+		pass
+
+class TestPlay(unittest.TestCase):
+	t_log = {}
+	@classmethod
+	def setUpClass(cls):
+		t_play = TwoPlayerGame()
+		cls.t_log = t_play.game_log
+	#hand is shuffled, each player recieves 6 cards
+	def test_initial_deal(self):
+		self.assertEqual(len(self.t_log["game 1"]["initial deal"]["p1_hand"]),6)
+		self.assertEqual(len(self.t_log["game 1"]["initial deal"]["p2_hand"]),6)
+	#each player discards 2 cards based on model, this gets moved into "kitty"
+	#they cut a card - upturn value is stored
+	#players begin pegging - Test cases invoked in testpeg class
+	#after all cards are on the table, scoring round moves on, first scoring is done by non-dealer then dealer
+	#data from round is then logged and stored
+
 				
 
 if __name__ == '__main__':
