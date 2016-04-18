@@ -72,11 +72,11 @@ def scorehand(ary, turn_up = '', ispeg = False):
 			current_flush = max([suits.count(a) for a in suits])
 			if(current_flush >= largest_flush):
 				largest_flush = current_flush
-	if(largest_flush >= 4 and ispeg == True):
+	if(largest_flush >= 4 and ispeg == False):
 		current_score += largest_flush
 
 	#check for nobs
-	if(turn_up != '' and ispeg == True):
+	if(turn_up != '' and ispeg == False):
 		suit_of_turnup = turn_up[-1]
 		if(('J' +  suit_of_turnup) in ary):
 			current_score += 1

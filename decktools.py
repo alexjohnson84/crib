@@ -18,7 +18,8 @@ class Decktools:
 		return self.deck.pop(0)
 	#cut the card for the spirit of it :)
 	def cut_card(self):
-		return self.deck.pop(randint(0,len(self.deck)))
+		a = self.deck.pop(randint(0,len(self.deck)))
+		return a.split()
 			
 	#return deck
 
