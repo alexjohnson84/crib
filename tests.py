@@ -77,7 +77,14 @@ class TestPlay(unittest.TestCase):
 		self.assertEqual(len(self.t_log["game 1"]["initial deal"]["p1_hand"]),6)
 		self.assertEqual(len(self.t_log["game 1"]["initial deal"]["p2_hand"]),6)
 	#each player discards 2 cards based on model, this gets moved into "kitty"
+	def test_initial_discard(self):
+		self.assertEqual(len(self.t_log["game 1"]["initial discard"]["p1_hand"]),4)
+		self.assertEqual(len(self.t_log["game 1"]["initial discard"]["p2_hand"]),4)
+		self.assertEqual(len(self.t_log["game 1"]["initial discard"]["kitty"]),4)
 	#they cut a card - upturn value is stored
+	def test_card_flip(self):
+		self.assertEqual(len(self.t_log["game 1"]["turn"]["face_up"]),2)
+		self.assertEqual(self.t_log["game 1"]["turn"]["deck_length"],39)
 	#players begin pegging - Test cases invoked in testpeg class
 	#after all cards are on the table, scoring round moves on, first scoring is done by non-dealer then dealer
 	#data from round is then logged and stored

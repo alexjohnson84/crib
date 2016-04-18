@@ -87,7 +87,6 @@ def scorehand(ary, turn_up = '', ispeg = False):
 
 
 
-
 #print(generate_combos([1,2,3,4,5]))	
 #print(generate_combos(read_hand(test_hands,"fifteen","ex1")))
 #print(scorehand(read_hand(test_hands,"straight_4","ex1")))
