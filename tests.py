@@ -63,9 +63,10 @@ class TestCrib(unittest.TestCase):
 
 class TestPeg(unittest.TestCase):
 	#todo - test pegging
+	"""
 	def test_pegging(self):
 		pass
-
+		"""
 class TestPlay(unittest.TestCase):
 	t_log = {}
 	@classmethod
@@ -86,6 +87,15 @@ class TestPlay(unittest.TestCase):
 		self.assertEqual(len(self.t_log["game 1"]["turn"]["face_up"]),1)
 		self.assertEqual(self.t_log["game 1"]["turn"]["deck_length"],39)
 	#players begin pegging - Test cases invoked in testpeg class
+	def test_pegging(self):
+		#test history is logging appropriately
+		for key in self.t_log["game 1"]["pegging"].keys():
+			self.assertEqual(len(self.t_log["game 1"]["pegging"][key]["peg_hist"]), key, "peg action #" + str(key) + " failed")
+		#test that peg action #1 is opponent, peg action #3 is dealer
+		#test that "go" is returned by opponent who can't play
+		#test that "last card" registers a point
+
+
 	#after all cards are on the table, scoring round moves on, first scoring is done by non-dealer then dealer
 	#data from round is then logged and stored
 

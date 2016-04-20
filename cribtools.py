@@ -82,7 +82,12 @@ def scorehand(ary, turn_up = '', ispeg = False):
 			current_score += 1
 	return current_score
 
-
+def peg(hand, other_hand, count):
+	points = 0
+	count += int(value_map['numbers'][hand[0][:-1]])
+	if count == 15 or count == 31:
+		points += 2
+	return [points, hand[1:], hand[0], count]
 
 
 

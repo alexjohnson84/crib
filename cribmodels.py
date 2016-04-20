@@ -6,8 +6,8 @@ def cribmodel_p1(ary):
 	return a
 def pegmodel_p1(ary):
 	#placeholder - random shuffle
-	a = shuffle(ary)
-	return a
+	shuffle(ary)
+	return ary
 
 def cribmodel_p2(ary):
 	#placeholder - random shuffle
@@ -16,5 +16,5 @@ def cribmodel_p2(ary):
 
 def pegmodel_p2(ary):
 	#placeholder - random shuffle
-	b = shuffle(ary)
-	return b
+	shuffle(ary)
+	return ary
