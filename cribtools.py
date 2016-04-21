@@ -1,4 +1,4 @@
-#from decktools import deck_init
+from decktools import read_hand
 import json
 import itertools
 
@@ -8,14 +8,13 @@ value_map = json.load(open("value_map.txt"))
 #Helper function brought in for debugging
 test_hands = json.load(open("test_files/test_hands.txt"))
 
-def read_hand(hands,ptype,example):
-	return(eval(hands[ptype][example]))
 
 def generate_combos(ary, ispeg = False):
 	output = []
-	for i in range(2,len(ary)+1):
-		output.append(list(itertools.combinations(ary,i)))
-	return list(itertools.chain(*output))
+	if(ispeg == False):
+		for i in range(2,len(ary)+1):
+			output.append(list(itertools.combinations(ary,i)))
+		return list(itertools.chain(*output))
 
 #todo - add ispeg methods
 def scorehand(ary, turn_up = '', ispeg = False):
@@ -36,14 +35,14 @@ def scorehand(ary, turn_up = '', ispeg = False):
 		if combo_sum == 15:
 			current_score += 2
 	#check for pairs
-	for combo in combinations:
-		#skip if combo is not equal to 2, avoids duping
-		if(len(combo) != 2):
-			pass
-		else:
-			card_vals = [card[:-1] for card in combo]
-			pairs = set([x for x in card_vals if card_vals.count(x) == 2])
-			current_score += 2 * len(pairs)
+	card_vals = [card[:-1] for card in full_hand]
+	dup_dic = dict((x,card_vals.count(x)) for x in set(card_vals))
+	count_dupes = [dup_dic[x] for x in dup_dic.keys() if dup_dic[x] > 1]
+	pairs_scores = {2 : 2, 3 : 6, 4 : 12}
+	for key in pairs_scores.keys():
+		for dup_count in count_dupes:
+			if key in count_dupes:
+				current_score += pairs_scores[key]
 
 	#check for runs
 	longest_straight = 0
@@ -95,4 +94,5 @@ def peg(hand, other_hand, count):
 
 #print(generate_combos([1,2,3,4,5]))	
 #print(generate_combos(read_hand(test_hands,"fifteen","ex1")))
-#print(scorehand(read_hand(test_hands,"straight_4","ex1")))
+#print(scorehand(read_hand(test_hands,"handscore","15 point","ex1")))
+#print(scorehand(read_hand(test_hands,"handscore","16 point","ex2")))

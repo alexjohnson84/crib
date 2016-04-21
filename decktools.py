@@ -4,6 +4,10 @@ from random import shuffle, randint
 suits = ['C', 'S', 'H', 'D']
 values = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
 
+#read a hand from specific example
+def read_hand(hands,scoretype, h_type,example):
+	return(eval(hands[scoretype][h_type][example]))
+
 class Decktools:
 
 	def __init__(self):

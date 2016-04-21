@@ -1,6 +1,6 @@
 import unittest
 from cribplay import TwoPlayerGame
-from decktools import Decktools
+from decktools import Decktools, read_hand
 from cribtools import scorehand
 import json
 
@@ -8,9 +8,8 @@ test_hands = json.load(open("test_files/test_hands.txt"))
 
 
 
-#read a hand from specific example
-def read_hand(hands,scoretype, h_type,example):
-	return(eval(hands[scoretype][h_type][example]))
+
+
 #list examples from test hand file
 def list_examples(hands,scoretype,ptype):
 	examps = list([k for k in hands[scoretype][ptype].keys() if k[0:2] == "ex"])
@@ -20,15 +19,15 @@ def define_testcase(src, scoretype, h_type,score, turn_up = False, is_equal = Tr
 	if(scoretype == "handscore"):
 		for example in list_examples(src, scoretype, h_type):
 			if(turn_up == False):
-				assert scorehand(read_hand(src, scoretype, h_type, example)) == score
+				assert scorehand(read_hand(src, scoretype, h_type, example)) == score,  str(h_type) + " " + str(example) + " : " + str(score) + " != " + str(scorehand(read_hand(src, scoretype, h_type, example)))
 			if(turn_up == True):
 				assert scorehand(read_hand(src, scoretype, h_type, example),read_hand(src, scoretype, h_type, "turn_" + example)) == score
 	if(scoretype == "pegscore"):
 		for example in list_examples(src, scoretype, h_type):
 			if(is_equal == True):
-				self.assertEqual(scorehand(read_hand(src, h_type, example)),score)
+				assert scorehand(read_hand(src, scoretype, h_type, example)) == score, str(h_type) + " " + str(example) + " : " + str(score) + " != " + str(scorehand(read_hand(src, scoretype, h_type, example)))
 			if(is_equal == False):
-				self.assertNotEqual(scorehand(read_hand(src, h_type, example)),score)
+				assert scorehand(read_hand(src, scoretype, h_type, example)) != score, str(h_type) + " " + str(example) + " : " + str(score) + " should not equal " + str(scorehand(read_hand(src, scoretype, h_type, example)))
 
 class TestDeck(unittest.TestCase):
 	#test to see deck has 52 cards
@@ -70,7 +69,7 @@ class TestCrib(unittest.TestCase):
 		define_testcase(test_hands, "handscore", "16 point", 16)
 
 		define_testcase(test_hands, "handscore", "29 point", 29, True)
-"""
+
 class TestPeg(unittest.TestCase):
 	#todo - test pegging
 	
@@ -83,7 +82,7 @@ class TestPeg(unittest.TestCase):
 	def test_straight_patterns(self):
 		#define_testcase(test_hands, "pegscore", "straight_7",7)
 		pass
-	"""	
+
 		
 class TestPlay(unittest.TestCase):
 	t_log = {}
