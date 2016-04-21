@@ -139,9 +139,9 @@ class TwoPlayerGame():
 	def __init__(self):
 		while (self.p1_score < 120 and self.p2_score < 120):
 			self.playgame()
-		pprint.pprint(self.game_log)
+		#pprint.pprint(self.game_log)
 
-a = TwoPlayerGame()
+#a = TwoPlayerGame()
 #print(a.game_log['game 1']['pegging'])
 
 

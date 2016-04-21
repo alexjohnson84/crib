@@ -76,8 +76,9 @@ def scorehand(ary, turn_up = '', ispeg = False):
 		current_score += largest_flush
 
 	#check for nobs
+
 	if(turn_up != '' and ispeg == False):
-		suit_of_turnup = turn_up[-1]
+		suit_of_turnup = turn_up[-1][-1]
 		if(('J' +  suit_of_turnup) in ary):
 			current_score += 1
 	return current_score

@@ -9,19 +9,20 @@ test_hands = json.load(open("test_files/test_hands.txt"))
 
 
 #read a hand from specific example
-def read_hand(hands,ptype,example):
-	return(eval(hands[ptype][example]))
+def read_hand(hands,scoretype, h_type,example):
+	return(eval(hands[scoretype][h_type][example]))
 #list examples from test hand file
 def list_examples(hands,scoretype,ptype):
-	examps = list([k for k in hands[scoretype][ptype].keys() if k[0:1] == "ex"])
+	examps = list([k for k in hands[scoretype][ptype].keys() if k[0:2] == "ex"])
 	return examps
+
 def define_testcase(src, scoretype, h_type,score, turn_up = False, is_equal = True):
 	if(scoretype == "handscore"):
 		for example in list_examples(src, scoretype, h_type):
 			if(turn_up == False):
-				self.assertEqual(scorehand(read_hand(src, h_type, example)),score)
+				assert scorehand(read_hand(src, scoretype, h_type, example)) == score
 			if(turn_up == True):
-				self.assertEqual(scorehand(read_hand(src, h_type, example)), scorehand(read_hand(src, h_type, "turn_" + example)),score)
+				assert scorehand(read_hand(src, scoretype, h_type, example),read_hand(src, scoretype, h_type, "turn_" + example)) == score
 	if(scoretype == "pegscore"):
 		for example in list_examples(src, scoretype, h_type):
 			if(is_equal == True):
@@ -58,6 +59,7 @@ class TestCrib(unittest.TestCase):
 		define_testcase(test_hands, "handscore", "flush_4",4)
 		define_testcase(test_hands, "handscore", "flush_5",5)
 
+
 	def test_nobs(self):
 		define_testcase(test_hands, "handscore", "nobs", 1, True)
 
@@ -66,14 +68,22 @@ class TestCrib(unittest.TestCase):
 		define_testcase(test_hands, "handscore", "10 point",10)
 		define_testcase(test_hands, "handscore", "15 point",15)
 		define_testcase(test_hands, "handscore", "16 point", 16)
-		define_testcase(test_hands, "handscore", "29 point", 29, True)
 
+		define_testcase(test_hands, "handscore", "29 point", 29, True)
+"""
 class TestPeg(unittest.TestCase):
 	#todo - test pegging
 	
 	def test_pair_patterns(self):
+		#define_testcase(test_hands, "pegscore", "doubles",2)
+		#define_testcase(test_hands, "pegscore", "not_doubles", 2, False, True)
+		#define_testcase(test_hands, "pegscore", "triples",3)
+		#define_testcase(test_hands, "pegscore", "not_triples", 3, False, True)
 		pass
-		
+	def test_straight_patterns(self):
+		#define_testcase(test_hands, "pegscore", "straight_7",7)
+		pass
+	"""	
 		
 class TestPlay(unittest.TestCase):
 	t_log = {}
