@@ -11,7 +11,7 @@ test_hands = json.load(open("test_files/test_hands.txt"))
 def read_hand(hands,ptype,example):
 	return(eval(hands[ptype][example]))
 
-def generate_combos(ary):
+def generate_combos(ary, ispeg = False):
 	output = []
 	for i in range(2,len(ary)+1):
 		output.append(list(itertools.combinations(ary,i)))
