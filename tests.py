@@ -75,9 +75,9 @@ class TestPeg(unittest.TestCase):
 	
 	def test_pair_patterns(self):
 		define_testcase(test_hands, "pegscore", "doubles",2)
-		#define_testcase(test_hands, "pegscore", "not_doubles", 2, False, True)
-		#define_testcase(test_hands, "pegscore", "triples",6)
-		#define_testcase(test_hands, "pegscore", "not_triples", 3, False, True)
+		define_testcase(test_hands, "pegscore", "not_doubles", 0, False, True)
+		define_testcase(test_hands, "pegscore", "triples",6)
+		define_testcase(test_hands, "pegscore", "not_triples", 0, False, True)
 		
 	def test_straight_patterns(self):
 		#define_testcase(test_hands, "pegscore", "straight_7",7)

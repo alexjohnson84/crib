@@ -41,12 +41,19 @@ def scorehand(ary, turn_up = '', ispeg = False):
 			current_score += 2
 	#check for pairs
 	card_vals = [card[:-1] for card in full_hand]
-	dup_dic = dict((x,card_vals.count(x)) for x in set(card_vals))	
 	if(ispeg == False):
-		count_dupes = [dup_dic[x] for x in dup_dic.keys() if dup_dic[x] > 1]
+		dup_dic = dict((x,card_vals.count(x)) for x in set(card_vals))
+		#count_dupes = [dup_dic[x] for x in dup_dic.keys() if dup_dic[x] > 1]
 	if(ispeg == True):
-		#for pegging, we don't care about the pair unless it's in the last card
-		count_dupes = [dup_dic[x] for x in dup_dic.keys() if dup_dic[x] > 1 and x == full_hand[-1][:-1]]
+		pair_cards = card_vals.pop(-1)
+		pair_cards = pair_cards.split()
+		for a in card_vals[::-1]:
+			if a == pair_cards[0]:
+				pair_cards.append(a)
+			else:
+				break
+		dup_dic = dict((x,pair_cards.count(x)) for x in set(pair_cards))		
+	count_dupes = [dup_dic[x] for x in dup_dic.keys() if dup_dic[x] > 1]
 	pairs_scores = {2 : 2, 3 : 6, 4 : 12}
 	for key in pairs_scores.keys():
 		for dup_count in count_dupes:
