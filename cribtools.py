@@ -15,6 +15,11 @@ def generate_combos(ary, ispeg = False):
 		for i in range(2,len(ary)+1):
 			output.append(list(itertools.combinations(ary,i)))
 		return list(itertools.chain(*output))
+	if(ispeg == True):
+		for i in range(2, len(ary)):
+			output.append(tuple(ary[-i:]))
+		return list(output)
+
 
 #todo - add ispeg methods
 def scorehand(ary, turn_up = '', ispeg = False):
@@ -25,7 +30,7 @@ def scorehand(ary, turn_up = '', ispeg = False):
 		full_hand = ary
 	#initate variables
 	current_score = 0
-	combinations = generate_combos(full_hand)
+	combinations = generate_combos(full_hand, ispeg)
 	#check for fifteens
 	for combo in combinations:
 		combo_sum = 0
@@ -36,14 +41,18 @@ def scorehand(ary, turn_up = '', ispeg = False):
 			current_score += 2
 	#check for pairs
 	card_vals = [card[:-1] for card in full_hand]
-	dup_dic = dict((x,card_vals.count(x)) for x in set(card_vals))
-	count_dupes = [dup_dic[x] for x in dup_dic.keys() if dup_dic[x] > 1]
+	dup_dic = dict((x,card_vals.count(x)) for x in set(card_vals))	
+	if(ispeg == False):
+		count_dupes = [dup_dic[x] for x in dup_dic.keys() if dup_dic[x] > 1]
+	if(ispeg == True):
+		#for pegging, we don't care about the pair unless it's in the last card
+		count_dupes = [dup_dic[x] for x in dup_dic.keys() if dup_dic[x] > 1 and x == full_hand[-1][:-1]]
 	pairs_scores = {2 : 2, 3 : 6, 4 : 12}
 	for key in pairs_scores.keys():
 		for dup_count in count_dupes:
+
 			if key in count_dupes:
 				current_score += pairs_scores[key]
-
 	#check for runs
 	longest_straight = 0
 	longest_straight_cards = []
@@ -92,7 +101,8 @@ def peg(hand, other_hand, count):
 
 
 
-#print(generate_combos([1,2,3,4,5]))	
+#print(generate_combos([1,2,3,4,5], True))	
 #print(generate_combos(read_hand(test_hands,"fifteen","ex1")))
 #print(scorehand(read_hand(test_hands,"handscore","15 point","ex1")))
 #print(scorehand(read_hand(test_hands,"handscore","16 point","ex2")))
+#print(scorehand(read_hand(test_hands,"pegscore","doubles","ex1"), '', True))

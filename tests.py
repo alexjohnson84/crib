@@ -19,15 +19,15 @@ def define_testcase(src, scoretype, h_type,score, turn_up = False, is_equal = Tr
 	if(scoretype == "handscore"):
 		for example in list_examples(src, scoretype, h_type):
 			if(turn_up == False):
-				assert scorehand(read_hand(src, scoretype, h_type, example)) == score,  str(h_type) + " " + str(example) + " : " + str(score) + " != " + str(scorehand(read_hand(src, scoretype, h_type, example)))
+				assert scorehand(read_hand(src, scoretype, h_type, example)) == score,  str(h_type) + " " + str(example) + " : " + str(score) + " does not equal " + str(scorehand(read_hand(src, scoretype, h_type, example)))
 			if(turn_up == True):
 				assert scorehand(read_hand(src, scoretype, h_type, example),read_hand(src, scoretype, h_type, "turn_" + example)) == score
 	if(scoretype == "pegscore"):
 		for example in list_examples(src, scoretype, h_type):
 			if(is_equal == True):
-				assert scorehand(read_hand(src, scoretype, h_type, example)) == score, str(h_type) + " " + str(example) + " : " + str(score) + " != " + str(scorehand(read_hand(src, scoretype, h_type, example)))
+				assert scorehand(read_hand(src, scoretype, h_type, example), "", True) == score, str(h_type) + " " + str(example) + " : " + str(score) + " does not equal  " + str(scorehand(read_hand(src, scoretype, h_type, example)))
 			if(is_equal == False):
-				assert scorehand(read_hand(src, scoretype, h_type, example)) != score, str(h_type) + " " + str(example) + " : " + str(score) + " should not equal " + str(scorehand(read_hand(src, scoretype, h_type, example)))
+				assert scorehand(read_hand(src, scoretype, h_type, example), "", True) != score, str(h_type) + " " + str(example) + " : " + str(score) + " should not equal " + str(scorehand(read_hand(src, scoretype, h_type, example)))
 
 class TestDeck(unittest.TestCase):
 	#test to see deck has 52 cards
@@ -74,11 +74,11 @@ class TestPeg(unittest.TestCase):
 	#todo - test pegging
 	
 	def test_pair_patterns(self):
-		#define_testcase(test_hands, "pegscore", "doubles",2)
+		define_testcase(test_hands, "pegscore", "doubles",2)
 		#define_testcase(test_hands, "pegscore", "not_doubles", 2, False, True)
-		#define_testcase(test_hands, "pegscore", "triples",3)
+		#define_testcase(test_hands, "pegscore", "triples",6)
 		#define_testcase(test_hands, "pegscore", "not_triples", 3, False, True)
-		pass
+		
 	def test_straight_patterns(self):
 		#define_testcase(test_hands, "pegscore", "straight_7",7)
 		pass
