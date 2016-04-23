@@ -16,7 +16,7 @@ def generate_combos(ary, ispeg = False):
 			output.append(list(itertools.combinations(ary,i)))
 		return list(itertools.chain(*output))
 	if(ispeg == True):
-		for i in range(2, len(ary)):
+		for i in range(2, len(ary)+1):
 			output.append(tuple(ary[-i:]))
 		return list(output)
 
@@ -68,6 +68,7 @@ def scorehand(ary, turn_up = '', ispeg = False):
 		#skip if combo is greater than 3 and has a potential to be the longest straight
 		#main objective here is to find the longest straight, but to double count straights with pairs
 		if(len(combo) >= 3 and len(combo) >= longest_straight):
+
 			runtotal = (int(value_map['sequence'][card[:-1]]) for card in combo)
 			seq = sorted(list(runtotal))
 			#determine if the cards are sequential
@@ -75,9 +76,13 @@ def scorehand(ary, turn_up = '', ispeg = False):
 				all_long_straights.append(combo)
 				longest_straight = len(combo)
 				longest_straight_cards = combo
-	#count double & triple runs
-	equivalent_straights = [a for a in all_long_straights if len(a) == longest_straight]	
-	current_score += longest_straight * len(equivalent_straights)
+	#count double & triple runs if non-peg
+	if ispeg == False:
+		equivalent_straights = [a for a in all_long_straights if len(a) == longest_straight]
+		current_score += longest_straight * len(equivalent_straights)	
+	if ispeg == True:
+		current_score += longest_straight
+
 
 	#check for flush
 	largest_flush = 0
@@ -112,4 +117,5 @@ def peg(hand, other_hand, count):
 #print(generate_combos(read_hand(test_hands,"fifteen","ex1")))
 #print(scorehand(read_hand(test_hands,"handscore","15 point","ex1")))
 #print(scorehand(read_hand(test_hands,"handscore","16 point","ex2")))
-#print(scorehand(read_hand(test_hands,"pegscore","doubles","ex1"), '', True))
+#print(scorehand(read_hand(test_hands,"pegscore","straight_7","ex1"), '', True))
+

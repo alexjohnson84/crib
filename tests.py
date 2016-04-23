@@ -50,6 +50,7 @@ class TestCrib(unittest.TestCase):
 		define_testcase(test_hands, "handscore", "pair",2)
 
 	def test_straight(self):
+		define_testcase(test_hands, "handscore", "straight_2",0)
 		define_testcase(test_hands, "handscore", "straight_3",3)
 		define_testcase(test_hands, "handscore", "straight_4",4)
 		define_testcase(test_hands, "handscore", "straight_5",5)
@@ -71,17 +72,20 @@ class TestCrib(unittest.TestCase):
 		define_testcase(test_hands, "handscore", "29 point", 29, True)
 
 class TestPeg(unittest.TestCase):
-	#todo - test pegging
 	
 	def test_pair_patterns(self):
 		define_testcase(test_hands, "pegscore", "doubles",2)
-		define_testcase(test_hands, "pegscore", "not_doubles", 0, False, True)
+		define_testcase(test_hands, "pegscore", "not_doubles", 0)
 		define_testcase(test_hands, "pegscore", "triples",6)
-		define_testcase(test_hands, "pegscore", "not_triples", 0, False, True)
-		
+		define_testcase(test_hands, "pegscore", "not_triples", 0)
+		define_testcase(test_hands, "pegscore", "quadruple",12)
+
 	def test_straight_patterns(self):
-		#define_testcase(test_hands, "pegscore", "straight_7",7)
-		pass
+		#straight 2 is no points
+		define_testcase(test_hands, "pegscore", "straight_2",0)
+		define_testcase(test_hands, "pegscore", "straight_3",3)
+		define_testcase(test_hands, "pegscore", "straight_7",7)
+
 
 		
 class TestPlay(unittest.TestCase):
