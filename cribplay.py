@@ -1,15 +1,24 @@
-from decktools import Decktools
+from decktools import Decktools, prompt_action
 from cribmodels import *
 from random import shuffle
 from cribtools import scorehand, peg
 import pprint
+import json
+import os
 
-def discard_two(hand, kit):
-	kitty = kit
-	for i in range(2):
-		kitty.append(hand[i])
-	handy = hand[2:]
-	return (handy, kitty)
+def clear_terminal():
+	os.system('cls' if os.name == 'nt' else 'clear')
+
+def discard_two(hand, kitty, player, man = False):
+	if man == True:
+		selection = prompt_action(hand,"select cards to discard: ",2, str(player))
+		kitty.append(selection)
+		hand = list(set(hand)^set(selection))
+	else:
+		for i in range(2):
+			kitty.append(hand[i])
+		hand = hand[2:]
+	return (hand, kitty)
 
 def switch_player(current_player):
 	if(current_player) == "p1":
@@ -20,13 +29,16 @@ def switch_player(current_player):
 class TwoPlayerGame():
 
 	game_log = {}
-	game_number = 1
+	round_number = 1
 	p1_score = 0
 	p2_score = 0
 	current_dealer = "p1" 
 
-	def playgame(self):
-		game_num_str = "game " + str(self.game_number)
+	def see_scores(self):
+		return "p1 : " + str(self.p1_score) + ", p2 : " + str(self.p2_score)
+		
+	def playgame(self, man1, man2):
+		game_num_str = "round " + str(self.round_number)
 		self.game_log[game_num_str] = {}
 		current_deck = Decktools()
 		p1_hand = []
@@ -42,13 +54,19 @@ class TwoPlayerGame():
 		cribmodel_p1(p1_hand)
 		cribmodel_p2(p2_hand)
 
-		(p1_hand, kitty) = discard_two(p1_hand,kitty)
-		(p2_hand, kitty) = discard_two(p2_hand,kitty)
+		if man1 == True or man2 == True:
+			print("current dealer is " + str(self.current_dealer))
+		(p1_hand, kitty) = discard_two(p1_hand,kitty, "Player 1", man1)
+		(p2_hand, kitty) = discard_two(p2_hand,kitty, "Player 2", man2)
 		#log initial discard
 		self.game_log[game_num_str]["initial discard"] = {"p1_hand" : p1_hand, "p2_hand" : p2_hand,"kitty" : kitty}
 
 		#cut & flip card
 		face_up = current_deck.cut_card()
+		if man1 == True or man2 == True:
+			print("face up card is " + str(face_up))
+			input("Press Enter to continue...")
+			clear_terminal()
 
 		#add nobs
 		if 'J' in face_up[0]:
@@ -56,6 +74,9 @@ class TwoPlayerGame():
 				self.p2_score += 1
 			else:
 				self.p1_score += 1
+			if man1 == True or man2 == True:
+				print(str(self.current_dealer) + " got nobs!")
+				input("Press Enter to continue...")
 
 		self.game_log[game_num_str]["turn"] = {"face_up" : face_up, "deck_length" : len(current_deck.deck)}
 		#TODO - do pegging here
@@ -69,55 +90,35 @@ class TwoPlayerGame():
 		self.game_log[game_num_str]["pegging"] = {peg_action : {"current_pegger" : "NA", "p1_hand_peg" : p1_hand_peg, "p2_hand_peg" : p2_hand_peg, "current_count" : current_count, "peg_hist" : current_hist}}
 		peg_action += 1
 		#print(self.game_log['game 1']['pegging'])
-		#TODO finish this section
 		
 		while (len(p1_hand_peg) > 0 or len(p2_hand_peg) > 0):
-			"""
-			if current_pegger == "p1":
-				if(len(p1_hand_peg)) > 0:
-					p1_hand_peg = pegmodel_p1(p1_hand_peg, current_count)
-					peg_round = peg(p1_hand_peg, current_count)
-					#todo - create peg round function
-					self.p1_score += peg_round[0]
-					p1_hand_peg = peg_round[1]
-					peg_hist.append(peg_round[2])
-					current_count += peg_round[3]
-				else:
-					self.p2_score += 1
-			if current_pegger == "p2":
-				if(len(p2_hand_peg)) > 0:
-					p2_hand_peg = pegmodel_p2(p2_hand_peg, current_count)
-					peg_round = peg(p2_hand_peg, current_count)
-					self.p2_score += peg_round[0]
-					p2_hand_peg = peg_round[1]
-					peg_hist.append(peg_round[2])
-					current_count += peg_round[3]
-			"""
+
 			if current_pegger == "p1":
 				if(len(p1_hand_peg)) > 0:
 					p1_hand_peg = pegmodel_p1(p1_hand_peg)
-					peg_round = peg(p1_hand_peg, p2_hand_peg, current_count)
+					peg_round = peg("Player 1", p1_hand_peg, p2_hand_peg, current_count,peg_hist, man1, self.see_scores())
 					self.p1_score += peg_round[0]
-					p1_hand_peg = peg_round[1]
-					current_card = peg_round[2].split()
-					peg_hist = peg_hist + current_card
-					current_count = peg_round[3]
+					self.p2_score += peg_round[1]
+					p1_hand_peg = peg_round[2]
+					current_card = peg_round[3].split()
+					peg_hist = peg_round[5]
+					current_count = peg_round[4]
 			if current_pegger == "p2":
 
 				if(len(p2_hand_peg)) > 0:
 					p2_hand_peg = pegmodel_p2(p2_hand_peg)
-					#print(p1_hand,p2_hand)
-					#print(peg(p2_hand_peg, p1_hand_peg, current_count))
-					peg_round = peg(p2_hand_peg, p1_hand_peg, current_count)
+					peg_round = peg("Player 2", p2_hand_peg, p1_hand_peg, current_count,peg_hist, man2, self.see_scores())
 					self.p2_score += peg_round[0]
-					p2_hand_peg = peg_round[1]
-					current_card = peg_round[2].split()
-					peg_hist = peg_hist + current_card
-					current_count = peg_round[3]
+					self.p1_score += peg_round[1]
+					p2_hand_peg = peg_round[2]
+					current_card = peg_round[3].split()
+					peg_hist = peg_round[5]
+					current_count = peg_round[4]
+			clear_terminal()
 					
 
 			current_hist = peg_hist
-			self.game_log[game_num_str]["pegging"][peg_action] = {"current_card": current_card, "current_pegger" : current_pegger, "p1_hand_peg" : p1_hand_peg, "p2_hand_peg" : p2_hand_peg, "current_count" : current_count, "peg_hist": current_hist}
+			self.game_log[game_num_str]["pegging"][peg_action] = {"current_card": current_card, "current_pegger" : current_pegger, "p1_hand_peg" : p1_hand_peg, "p2_hand_peg" : p2_hand_peg, "current_count" : current_count, "peg_hist": current_hist, "p1_score" : self.p1_score, "p2_score" : self.p2_score}
 			peg_action += 1
 			current_pegger = switch_player(current_pegger)
 
@@ -130,18 +131,32 @@ class TwoPlayerGame():
 			self.p1_score += scorehand(p1_hand,face_up)
 			self.p2_score += scorehand(p2_hand,face_up)
 			self.p2_score += scorehand(kitty, face_up)
+		self.game_log[game_num_str]["handscoring"] = {"p1 hand score" : scorehand(p1_hand,face_up), "p2 hand score" : scorehand(p2_hand,face_up), "kitty score" : scorehand(kitty, face_up)}
+		self.game_log[game_num_str]["round_score"] = {"p1 round score" : self.p1_score, "p2 round score" : self.p2_score}
+
 
 		#switch dealer
 		self.current_dealer = switch_player(self.current_dealer)
+
+		self.round_number += 1
 		#placeholder for testing
-		self.p1_score = 120
+		#self.p1_score = 120
 
-	def __init__(self):
+	def __init__(self, man1 = False, man2 = False):
 		while (self.p1_score < 120 and self.p2_score < 120):
-			self.playgame()
+			self.playgame(man1, man2)
+		#scoring doesn't go above 120
+		if self.p1_score > 120:
+			self.p1_score = 120
+		if self.p2_score > 120:
+			self.p2_score = 120
+		#log final scores
+		self.game_log["final score"] = {"p1 final score" : self.p1_score, "p2 final score" : self.p2_score}
 		#pprint.pprint(self.game_log)
+		with open('data.txt', 'w') as outfile:
+			json.dump(self.game_log, outfile, indent = 4, sort_keys = True)
 
-#a = TwoPlayerGame()
+a = TwoPlayerGame(True, True)
 #print(a.game_log['game 1']['pegging'])
 
 

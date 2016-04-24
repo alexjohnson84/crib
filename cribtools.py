@@ -1,6 +1,7 @@
-from decktools import read_hand
+from decktools import read_hand, prompt_action
 import json
 import itertools
+
 
 
 value_map = json.load(open("value_map.txt"))
@@ -32,13 +33,14 @@ def scorehand(ary, turn_up = '', ispeg = False):
 	current_score = 0
 	combinations = generate_combos(full_hand, ispeg)
 	#check for fifteens
-	for combo in combinations:
-		combo_sum = 0
-		for card in combo:
-			combo_sum += int(value_map['numbers'][card[:-1]])
-		#if sum is 15, add 2 to current score
-		if combo_sum == 15:
-			current_score += 2
+	if ispeg == False:
+		for combo in combinations:
+			combo_sum = 0
+			for card in combo:
+				combo_sum += int(value_map['numbers'][card[:-1]])
+			#if sum is 15, add 2 to current score
+			if combo_sum == 15:
+				current_score += 2
 	#check for pairs
 	card_vals = [card[:-1] for card in full_hand]
 	if(ispeg == False):
@@ -103,12 +105,40 @@ def scorehand(ary, turn_up = '', ispeg = False):
 			current_score += 1
 	return current_score
 
-def peg(hand, other_hand, count):
-	points = 0
-	count += int(value_map['numbers'][hand[0][:-1]])
+def peg(player, hand, other_hand, count, peg_hist, man = False, scores = ''):
+	points, opp_points = 0,0
+	
+	if man == True:
+		top_card_val = prompt_action(hand, "current scores are: " + scores + \
+			"\ncurrent count is: " + str(count) + \
+			"\npeg history is: " + str(peg_hist) + \
+			"\nSelect Card to play: ",1, str(player))
+		top_card_val = int(value_map['numbers'][top_card_val[0][:-1]])
+
+	else:
+		top_card_val = int(value_map['numbers'][hand[0][:-1]])
+	
+	#don't go over 31
+	if count + top_card_val <= 31:
+		count += top_card_val
+		peg_hist = peg_hist + hand[0].split()
+	else:
+		#account for "GO"
+		count = top_card_val
+		peg_hist = hand[0].split()
+		opp_points += 1
 	if count == 15 or count == 31:
 		points += 2
-	return [points, hand[1:], hand[0], count]
+	if count == 31:
+		count = 0
+		peg_hist = hand[0].split()
+	#score hist
+	points += scorehand(peg_hist, '', True)
+	#account for last card
+	if len(hand) == 1 and len(other_hand) == 0:
+		points += 1
+
+	return [points, opp_points, hand[1:], hand[0], count, peg_hist]
 
 
 
