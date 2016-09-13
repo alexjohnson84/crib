@@ -7,12 +7,15 @@ values = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
 class PlainDeck(object):
     """Initialize Base Deck Class with Basic Create, Shuffle, Deal, and Cut
     functions.  Inherited by CribDeck"""
-    def __init__(self):
+    def __init__(self, deck=None):
         """
         Create Deck and shuffle cards.  Cards will be in the format "2H, KS"
         """
-        self.deck = [''.join(list(x)) for x in itertools.product(values,suits)]
-        shuffle(self.deck)
+        if deck == None:
+            self.deck = [''.join(list(x)) for x in itertools.product(values,suits)]
+            shuffle(self.deck)
+        else:
+            self.deck = deck
     def draw_card(self):
         """
         Modify current deck and return drawn card
@@ -34,12 +37,12 @@ class CribDeck(PlainDeck):
     """
     Inherit PlainDeck functions, add cribbage specific functionality
     """
-    def __init__(self, num_p=2):
+    def __init__(self, num_p=2, deck=None):
         """
         Deal out cards based on number of players (functionality as of now
         will be only tested for 2)
         """
-        PlainDeck.__init__(self)
+        PlainDeck.__init__(self, deck)
         self.kitty = []
         self.num_p = num_p
     def deal(self, n_cards=6):
@@ -48,4 +51,5 @@ class CribDeck(PlainDeck):
         Input: n_cards
         Output: nested list of hands for n_players
         """
-        return [[self.draw_card for i in range(n_cards)] for j in num_p]
+        return [[self.draw_card() for i in range(n_cards)] \
+                                for _ in range(self.num_p)]
