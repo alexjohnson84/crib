@@ -33,6 +33,7 @@ class CribScore(object):
         score += self._score_flushes()
         score += self._score_runs()
         score += self._score_nobs()
+
         return score
 
     def _score_fifteens(self):
@@ -50,8 +51,11 @@ class CribScore(object):
 
 
     def _score_pairs(self):
-        return sum([value for key, value in self.value_counter.iteritems() \
-                                            if value >= 2])
+        mapped_pair = {2:2, 3:6, 4:12}
+        mapped_values = [mapped_pair[value] for value in self.value_counter.values() \
+                                            if value >= 2]
+        return sum(mapped_values)
+        return sum()
     def _score_flushes(self):
         return sum([value for key, value in self.suit_counter.iteritems() \
                                             if value >= 4])

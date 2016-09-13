@@ -144,6 +144,24 @@ class TestHandScoring(unittest.TestCase):
                 turn = eval(self.test_hands['nobs']['turn_' + key])
                 score = self.cs.score(eval(example), turn)
                 self.assertEqual(score, 1)
+    def test_edge_cases(self):
+        cases = [8,10,15,16]
+        for case_score in cases:
+            case_key = '%s point' % (case_score)
+            for key, example in self.test_hands[case_key].iteritems():
+                self.assertEqual(self.cs.score(eval(example)),
+                                case_score,
+                                '%s failed, %s != %s' % (example,
+                                                    case_score,
+                                                    self.cs.score(eval(example))
+                                                    )
+                                )
+    def test_perfect_hand(self):
+        for key, example in self.test_hands['29 point'].iteritems():
+            if key[:2] == 'ex':
+                turn = eval(self.test_hands['29 point']['turn_' + key])
+                score = self.cs.score(eval(example), turn)
+                self.assertEqual(score, 29)
 
 
 
