@@ -1,6 +1,8 @@
 import unittest
+from random import shuffle
 from deck import CribDeck
 from cribplay import CribGame
+from cribbage_scoring import CribScore
 
 class TestDeck(unittest.TestCase):
     """
@@ -94,6 +96,56 @@ class TestGamePlay(unittest.TestCase):
 
         self.assertTrue(type(new_status['faceup']) is str)
         self.assertEqual(len(new_status['deck']), 39)
+
+class TestHandScoring(unittest.TestCase):
+    """
+    Test scoring functions across different unique cases
+    """
+    with open('gameplay/test_files/test_hands.txt', 'r') as th:
+        test_hands = eval(th.read())['handscore']
+    cs = CribScore(score_type='hand')
+    def test_hand_fifteen(self):
+        for key, example in self.test_hands['fifteen'].iteritems():
+            self.assertEqual(self.cs.score(eval(example)), 2)
+    def test_hand_fifteen_turn(self):
+        for key, example in self.test_hands['fifteen_turn'].iteritems():
+            if key[:2] == 'ex':
+                self.assertEqual(
+                    self.cs.score(eval(example),
+                                    eval(self.test_hands['fifteen_turn']
+                                        ['turn_' + key])
+                                        )
+                                ,2)
+    def test_pairs(self):
+        for example in self.test_hands['pair'].values():
+            self.assertEqual(self.cs.score(eval(example)), 2)
+    def test_flushes(self):
+        for example in self.test_hands['flush_4'].values():
+            self.assertEqual(self.cs.score(eval(example)), 4)
+        for example in self.test_hands['flush_5'].values():
+            self.assertEqual(self.cs.score(eval(example)), 5)
+    def test_longest_consecutive_seq(self):
+        seq = [8,7,6,4,3,2,1]
+        long_seq = self.cs._longest_consecutive_sequence(seq)
+        self.assertEqual(long_seq, [1,2,3,4])
+        seq = [8,7,6,5,3,2,1]
+        shuffle(seq)
+        long_seq = self.cs._longest_consecutive_sequence(seq)
+        self.assertEqual(long_seq, [5,6,7,8])
+
+    def test_straights(self):
+        length_scores = [(2,0), (3,3), (4,4), (5,5)]
+        for length, score in length_scores:
+            for example in self.test_hands['straight_' + str(length)].values():
+                self.assertEqual(self.cs.score(eval(example)), score)
+    def test_nobs(self):
+        for key, example in self.test_hands['nobs'].iteritems():
+            if key[:2] == 'ex':
+                turn = eval(self.test_hands['nobs']['turn_' + key])
+                score = self.cs.score(eval(example), turn)
+                self.assertEqual(score, 1)
+
+
 
 
 if __name__ == '__main__':

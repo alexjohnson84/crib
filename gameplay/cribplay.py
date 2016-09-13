@@ -34,7 +34,8 @@ class CribGame(object):
             updated_status = self.turn(status)
         return updated_status
 
-    def create_response(self, phase, scores, hands, deck, faceup=None):
+    def create_response(self, phase, scores, hands, deck, faceup=None,
+                            peg_phist={}, peg_hist={}, kitty=[]):
         """
         Constructor for status response variables
         returns data in the following form:
@@ -75,6 +76,10 @@ class CribGame(object):
                                     )
 
     def discard(self, status, response):
+        """
+        Allow users to discard 2 cards from their hand, update
+        status variables
+        """
         phase = 'Discard'
         hands = status['hands']
         for hand, discards in zip(hands, response):
@@ -85,6 +90,9 @@ class CribGame(object):
                                     hands,
                                     status['deck'])
     def turn(self, status):
+        """
+        cut card for the turn, store in status variable
+        """
         phase = 'Turn'
         c_deck = CribDeck(deck=status['deck'])
         faceup = c_deck.cut_card()
@@ -93,3 +101,28 @@ class CribGame(object):
                                     status['hands'],
                                     c_deck.deck,
                                     faceup)
+
+    def pegging(self, status, response, player):
+        """
+        For each user, ingest status,response, and update score/status per
+        action
+        """
+        phase = 'Pegging'
+        player_pegs = len(status['peg_phist'][player])
+        scores = status['scores']
+        while player_pegs < 4:
+            hand = status['hands'][player]
+            selection = hand.pop(hand.index(response))
+            #append as list in case of null list
+            status['peg_phist'][player] += [selection]
+            status['peg_hist'] += [selection]
+            # score[player] += pegscore(phase, status['peg_hist'])
+            return self.create_response(phase,
+                                        scores,
+                                        status['hands'],
+                                        status['deck'],
+                                        status['faceup']
+                                        )
+        phase = 'Pegging_end'
+    def hand_scoring(self, status):
+        pass
