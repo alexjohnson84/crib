@@ -19,23 +19,27 @@ class CribGame(object):
         Initialize object and set num players (currently only tested with two)
         """
         self.num_p = num_p
+        self.current_status = None
     def update(self, status=None, response=None):
         """
         read in status and response variables, and actions upon them.
         Returns the status response variable to be actioned upon by the
         frontend
         """
+
+        if status is not None:
+            self.current_status = status['phase']
         if status == None:
             updated_status = self.deal_hands()
-        elif status['phase'] == 'Score':
+        elif self.current_status == 'Score':
             updated_status = self.deal_hands(status)
-        elif status['phase'] == 'Deal':
+        elif self.current_status == 'Deal':
             updated_status = self.discard(status, response)
-        elif status['phase'] == 'Discard':
+        elif self.current_status == 'Discard':
             updated_status = self.turn(status)
-        elif status['phase'] == 'Turn' or status['phase'] == 'Pegging':
+        elif self.current_status == 'Turn' or status['phase'] == 'Pegging':
             updated_status = self.pegging(status, response)
-        elif status['phase'] == 'Pegging Complete':
+        elif self.current_status == 'Pegging Complete':
             updated_status = self.hand_scoring(status)
 
         return updated_status
@@ -130,7 +134,7 @@ class CribGame(object):
 
         #extra 2 points for flipping a jack
         if faceup[0] == 'J':
-            score[status['dealer']] += 2
+            scores[status['dealer']] += 2
 
         return self.create_response(phase,
                                     status['scores'],
