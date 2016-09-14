@@ -108,10 +108,15 @@ class CribPegScore(object):
     def __init__(self, history):
         with open('gameplay/reference_files/value_map.txt', 'r') as vm:
             self.value_map = eval(vm.read())
-        self.r_hist = history[::-1]
         self.history = history
+
+        self.r_hist = history[::-1]
         if 'GO' in history:
             self.r_hist = self.r_hist[:self.r_hist.index('GO')]
+        #check if 31 has been met
+        idx_start = self._find_seq_start(self.r_hist)
+        self.r_hist = self.r_hist[:idx_start]
+
         self.mapped_sequence = \
                 [self.value_map['sequence'][val[:-1]] for val in self.r_hist]
         self.score = self._score_peg()
@@ -135,6 +140,16 @@ class CribPegScore(object):
             score += self._check_pair_points(self.r_hist)
             score += self._check_if_straight(self.r_hist)
         return score
+    def _find_seq_start(self, lst):
+        card_points = \
+            [self.value_map['numbers'][val[:-1]] for val in lst]
+        idx_start = len(card_points)
+        for i, card in enumerate(card_points):
+            total = sum(card_points[len(card_points) - i:])
+            if total == 31 and i != len(card_points):
+                idx_start = len(card_points) - i
+        return idx_start
+
 
     def _check_pair_points(self, lst):
         mapped_pair = {2:2, 3:6, 4:12}
@@ -172,13 +187,9 @@ class CribPegScore(object):
     def check_count(self):
         """
         Check the current count
-        History is sliced on the last 'GO', but if the count reaches 31
-        there is not a 'GO' contained in the history.  We reduce the count by
-        31 each time this happens
+        History is sliced on the last 'GO' and reduced to [] if 31 is met
         """
         card_points = \
-            [self.value_map['numbers'][val[:-1]] for val in self.r_hist[::-1]]
+            [self.value_map['numbers'][val[:-1]] for val in self.r_hist]
         total = sum(card_points)
-        while total > 31:
-            total -= 31
         return total

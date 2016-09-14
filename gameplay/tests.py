@@ -85,6 +85,7 @@ class TestGamePlay(unittest.TestCase):
                             .intersection(response[0])), 0)
         self.assertEqual(len(set(new_status['hands'][1])\
                             .intersection(response[1])), 0)
+        self.assertEqual(new_status['kitty'], ['4S', 'QH', '10S', 'AS'])
     def test_turn(self):
         """
         Test that the card is turned and that the deck is updated from
@@ -96,6 +97,29 @@ class TestGamePlay(unittest.TestCase):
 
         self.assertTrue(type(new_status['faceup']) is str)
         self.assertEqual(len(new_status['deck']), 39)
+    @unittest.skip("demonstrating skipping")
+    def test_pegging(self):
+        cg = CribGame()
+        old_status = self.test_status['test_pegging'][0]
+        for i, play in enumerate(self.test_status['test_pegging']):
+            if i == 0:
+                pass
+            else:
+                response = play['test_response']
+                new_status = cg.update(old_status, response)
+                print new_status
+                self.assertEqual(new_status['scores'], play['scores'])
+                self.assertEqual(new_status['peg_hist'], play['peg_hist'])
+                self.assertEqual(new_status['pegger'], play['pegger'])
+                for i in range(len(new_status['hands'])):
+                    self.assertEqual(set(new_status['hands'][i]),
+                                     set(play['hands'][i])
+                                     )
+                    self.assertEqual(set(new_status['peg_phist'][i]),
+                                     set(play['peg_phist'][i])
+                                     )
+                old_status = new_status
+
 
 class TestHandScoring(unittest.TestCase):
     """

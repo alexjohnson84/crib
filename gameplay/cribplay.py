@@ -1,4 +1,5 @@
 from deck import CribDeck
+from cribbage_scoring import CribHandScore, CribPegScore
 
 class CribGame(object):
     """
@@ -32,10 +33,14 @@ class CribGame(object):
             updated_status = self.discard(status, response)
         elif status['phase'] == 'Discard':
             updated_status = self.turn(status)
+        elif status['phase'] == 'Turn' or status['phase'] == 'Pegging':
+            updated_status = self.pegging(status, response)
+
         return updated_status
 
     def create_response(self, phase, scores, hands, deck, faceup=None,
-                            peg_phist={}, peg_hist={}, kitty=[]):
+                            peg_phist={0:[], 1:[]}, peg_hist=[], kitty=[], dealer=0,
+                            pegger=None):
         """
         Constructor for status response variables
         returns data in the following form:
@@ -50,14 +55,30 @@ class CribGame(object):
         response_dict['phase'] = phase
         response_dict['scores'] = scores
         response_dict['hands'] = hands
-        response_dict['faceup'] = faceup
         response_dict['deck'] = deck
+        response_dict['faceup'] = faceup
+        response_dict['peg_phist'] = peg_phist
+        response_dict['peg_hist'] = peg_hist
+        response_dict['kitty'] = kitty
+        response_dict['dealer'] = dealer
+        response_dict['pegger'] = pegger
         return response_dict
+
+    def switch_player(self, cur_player):
+        """
+        Switch player
+        Input: int {0,1}
+        Output: int {0,1} switched from current player
+        """
+        return abs(cur_player-1)
 
     def deal_hands(self, status=None):
         """
         Deal the hands, will have None status on first round of the game,
         After first round, status will contain a score
+
+        Dealer also needs to be switched on consecutive rounds.  If this is the
+        first round, the dealer defaults to player 0
 
         Input: status from previous hand (if applicable)
         Output: Shuffled deck and new hand
@@ -67,12 +88,15 @@ class CribGame(object):
         hands = self.crib_deck.deal()
         if status is not None:
             scores = status['scores']
+            dealer = self.switch_player(status['dealer'])
         else:
             scores = [0,0]
+            dealer = 0
         return self.create_response(phase,
                                     scores,
                                     hands,
-                                    self.crib_deck.deck
+                                    self.crib_deck.deck,
+                                    dealer = dealer
                                     )
 
     def discard(self, status, response):
@@ -82,13 +106,17 @@ class CribGame(object):
         """
         phase = 'Discard'
         hands = status['hands']
+        kitty = []
         for hand, discards in zip(hands, response):
             for card in discards:
                 hand.remove(card)
+                kitty.append(card)
         return self.create_response(phase,
                                     status['scores'],
                                     hands,
-                                    status['deck'])
+                                    status['deck'],
+                                    kitty=kitty,
+                                    dealer=status['dealer'])
     def turn(self, status):
         """
         cut card for the turn, store in status variable
@@ -100,28 +128,41 @@ class CribGame(object):
                                     status['scores'],
                                     status['hands'],
                                     c_deck.deck,
-                                    faceup)
+                                    faceup,
+                                    kitty=status['kitty'],
+                                    dealer=status['dealer'])
 
-    def pegging(self, status, response, player):
+    def pegging(self, status, response):
         """
         For each user, ingest status,response, and update score/status per
         action
         """
         phase = 'Pegging'
+        if status['pegger'] == None:
+            player = self.switch_player(status['dealer'])
+        else:
+            player = self.switch_player(status['pegger'])
         player_pegs = len(status['peg_phist'][player])
         scores = status['scores']
         while player_pegs < 4:
             hand = status['hands'][player]
             selection = hand.pop(hand.index(response))
             #append as list in case of null list
-            status['peg_phist'][player] += [selection]
             status['peg_hist'] += [selection]
-            # score[player] += pegscore(phase, status['peg_hist'])
+            status['peg_phist'][player] += [selection]
+
+            cps = CribPegScore(status['peg_hist'])
+            scores[player] += cps.score
             return self.create_response(phase,
                                         scores,
                                         status['hands'],
                                         status['deck'],
-                                        status['faceup']
+                                        status['faceup'],
+                                        kitty=status['kitty'],
+                                        dealer=status['dealer'],
+                                        peg_hist=status['peg_hist'],
+                                        peg_phist=status['peg_phist'],
+                                        pegger=player
                                         )
         phase = 'Pegging_end'
     def hand_scoring(self, status):

@@ -113,6 +113,10 @@
               "score": 0,
               "count": 2
               },
+      "ex2": {"hist": "['9H', '6D', '6S', '10C', 'JD', '9S']",
+              "score": 0,
+              "count": 19
+              },
     },
 
 		"doubles": {
