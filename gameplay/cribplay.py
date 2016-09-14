@@ -35,6 +35,8 @@ class CribGame(object):
             updated_status = self.turn(status)
         elif status['phase'] == 'Turn' or status['phase'] == 'Pegging':
             updated_status = self.pegging(status, response)
+        elif status['phase'] == 'Pegging Complete':
+            updated_status = self.hand_scoring(status)
 
         return updated_status
 
@@ -124,6 +126,12 @@ class CribGame(object):
         phase = 'Turn'
         c_deck = CribDeck(deck=status['deck'])
         faceup = c_deck.cut_card()
+        scores = status['scores']
+
+        #extra 2 points for flipping a jack
+        if faceup[0] == 'J':
+            score[status['dealer']] += 2
+
         return self.create_response(phase,
                                     status['scores'],
                                     status['hands'],
@@ -164,6 +172,33 @@ class CribGame(object):
                                         peg_phist=status['peg_phist'],
                                         pegger=player
                                         )
-        phase = 'Pegging_end'
+        phase = 'Pegging Complete'
+        hands = [status['p_hist'][key] for key in [0,1]]
+        return self.create_response(phase,
+                                    scores,
+                                    hands,
+                                    status['deck'],
+                                    status['faceup'],
+                                    kitty=status['kitty'],
+                                    dealer=status['dealer'],
+                                    pegger=None
+                                    )
     def hand_scoring(self, status):
-        pass
+        phase = 'Round Complete'
+        scores = status['scores']
+        turn = status['faceup']
+        chs = CribHandScore()
+        for i in range(len(scores)):
+            hand_score = chs.score(status['hands'][i], [turn])
+            scores[i] += hand_score
+            if i == status['dealer']:
+                kitty_score = chs.score(status['kitty'], [turn])
+                scores[i] += kitty_score
+        return self.create_response(phase,
+                                    scores,
+                                    status['hands'],
+                                    status['deck'],
+                                    status['faceup'],
+                                    kitty=status['kitty'],
+                                    dealer=status['dealer'],
+                                    )

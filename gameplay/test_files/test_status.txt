@@ -259,5 +259,21 @@
       'pegger': 1,
       'test_response': 'AC'
     }
-  ]
+  ],
+  "test_hand_scoring": {
+    'phase': 'Pegging Complete',
+    'deck': ['JH', '2D', '10H', '5D', '9D', '8C', '5H', '5S', '6C', 'AD', 'JC', '5C', 'KC', '8H', '2S', 'KS', '10D', '8S', '2C', '3H', 'QS', '3S', '9C', '4D', 'AH', '4C', '3C', '3D', 'KD', '6H', 'QC', '2H', '7S', 'QD', '7H', 'JS', '7C', '8D', 'KH'],
+    'faceup': '7D',
+    'hands': [
+      ['9H', '4H', '6S', 'JD'],
+      ['10C', '6D', '9S', 'AC']
+    ],
+    'scores': [0, 0],
+    'test_scores': [3, 6],
+    'kitty': ['4S', 'QH', '10S', 'AS'],
+    'dealer': 1,
+    'peg_phist': {0: [], 1: []},
+    'peg_hist': [],
+    'pegger': None,
+  }
 }

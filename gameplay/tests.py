@@ -118,6 +118,13 @@ class TestGamePlay(unittest.TestCase):
                                      )
                 old_status = new_status
 
+    def test_final_scoring(self):
+        cg = CribGame()
+        old_status = self.test_status['test_hand_scoring']
+        test_scores = self.test_status['test_hand_scoring']['test_scores']
+        new_status = cg.update(old_status)
+        self.assertEqual(new_status['scores'], test_scores)
+
 
 class TestHandScoring(unittest.TestCase):
     """
