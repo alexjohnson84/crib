@@ -1,7 +1,7 @@
 import itertools
 from collections import Counter
 
-class CribScore(object):
+class CribHandScore(object):
     """
     Score cribbage hand for both cases of pegging and handscoring
     """
@@ -24,23 +24,29 @@ class CribScore(object):
             self.full_hand = hand
         with open('gameplay/reference_files/value_map.txt', 'r') as vm:
             self.value_map = eval(vm.read())
-        self.value_counter = Counter([card[:-1] for card in self.full_hand])
-        self.suit_counter = Counter([card[-1] for card in self.full_hand])
+        self.value_counter, self.suit_counter = \
+                                self._value_and_suit_counters(self.full_hand)
 
         score = 0
-        score += self._score_fifteens()
-        score += self._score_pairs()
-        score += self._score_flushes()
-        score += self._score_runs()
-        score += self._score_nobs()
+        if self.score_type == 'hand':
+            score += self._score_fifteens(self.full_hand)
+            score += self._score_pairs(self.value_counter)
+            score += self._score_flushes(self.suit_counter)
+            score += self._score_runs(self.value_counter)
+            score += self._score_nobs()
 
         return score
 
-    def _score_fifteens(self):
+    def _value_and_suit_counters(self, hand):
+        value_counter = Counter([card[:-1] for card in hand])
+        suit_counter = Counter([card[-1] for card in hand])
+        return value_counter, suit_counter
+
+    def _score_fifteens(self, full_hand):
         current_score = 0
         combos = []
-        for i in range(2,len(self.full_hand)+1):
-            combos += list(itertools.combinations(self.full_hand,i))
+        for i in range(2,len(full_hand)+1):
+            combos += list(itertools.combinations(full_hand,i))
         for cards in combos:
             combo_sum = 0
             for card in cards:
@@ -50,22 +56,22 @@ class CribScore(object):
         return current_score
 
 
-    def _score_pairs(self):
+    def _score_pairs(self, value_counter):
         mapped_pair = {2:2, 3:6, 4:12}
-        mapped_values = [mapped_pair[value] for value in self.value_counter.values() \
+        mapped_values = [mapped_pair[value] for value in value_counter.values() \
                                             if value >= 2]
         return sum(mapped_values)
-        return sum()
-    def _score_flushes(self):
-        return sum([value for key, value in self.suit_counter.iteritems() \
+
+    def _score_flushes(self, suit_counter):
+        return sum([value for key, value in suit_counter.iteritems() \
                                             if value >= 4])
-    def _score_runs(self):
+    def _score_runs(self, value_counter):
         """
         Map values to the item in sequence, sort, and find longest consecutive
         sequence
         """
         sequence_counter = {self.value_map['sequence'][key]:value \
-                                for key, value in self.value_counter.iteritems()}
+                                for key, value in value_counter.iteritems()}
         sort_seq_keys = sequence_counter.keys()
         longest_sequence = self._longest_consecutive_sequence(sort_seq_keys)
 
@@ -97,3 +103,61 @@ class CribScore(object):
             if "J" + flipped_suit in self.hand:
                 current_score += 1
         return current_score
+
+class CribPegScore(object):
+    def __init__(self, history):
+        with open('gameplay/reference_files/value_map.txt', 'r') as vm:
+            self.value_map = eval(vm.read())
+        r_hist = history[::-1]
+        if 'GO' in history:
+            r_hist = r_hist[r_hist.find('GO'):]
+        self.mapped_sequence = \
+                    [self.value_map['sequence'][val[:-1]] for val in history]
+        self.history = history
+        self.score = self._score_peg()
+        self.count = self.check_count()
+        if self.count == 15 or self.count == 31:
+            self.score += 2
+        if self.history[-1] == 'GO':
+            self.score += 1
+
+
+    def _score_peg(self):
+        score = 0
+        score += self._check_pair_points(self.history)
+        score += self._check_if_straight(self.history)
+        return score
+
+    def _check_pair_points(self, lst):
+        mapped_pair = {2:2, 3:6, 4:12}
+        last_card = lst[0]
+        max_pair = 0
+        for value in lst:
+            if value == last_card:
+                max_pair += 1
+            else:
+                break
+        if max_pair == 1:
+            return 0
+        else:
+            return mapped_pair[max_pair]
+
+    def _check_if_straight(self, lst):
+        """
+        Setup sliding window and find lengths of lists that are valid runs.
+        return highest valid length of list
+        """
+        valid_runs = []
+        for i in range(3,len(lst)):
+            sorted_seq = sorted(self.mapped_sequence[:i])
+            for j in range(1,len(sorted_seq)):
+                if sorted_seq[j-1] != 1:
+                    break
+            valid_runs.append(i)
+        if len(valid_runs) == 0:
+            return 0
+        else:
+            return max(valid_runs)
+
+    def check_count(self):
+        return sum(self.mapped_sequence)

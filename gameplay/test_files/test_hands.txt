@@ -67,51 +67,93 @@
 		}
 	},
 	"pegscore": {
-		"fifteen": {
 
-		},
-		"31": {
-
-		},
-		"Go": {
-
-		},
 		"doubles": {
-			"ex1": "['10S','10H']",
-			"ex2": "['2H','KS','KH']",
-			"ex3": "['2S', '2H','KS','KH']"
+			"ex1": {"hist": "['10S','10H']",
+              "score": 2,
+              "count": 20
+              },
+			"ex2": {"hist": "['2H','KS','KH']",
+              "score": 2,
+              "count": 22
+              },
+			"ex3": {"hist" : "['2S', '2H','KS','KH']",
+              "score": 2,
+              "count": 24
+              }
 		},
 		"not_doubles": {
-			"ex1": "['KS','KH','2H']",
-			"ex2": "['KS','2H','KH']"
+			"ex1": {"hist": "['KS','KH','2H']",
+              "score": 0,
+              "count": 22
+              },
+			"ex2": {"hist": "['KS','2H','KH']",
+              "score": 0,
+              "count": 22
+              }
 		},
 		"triples": {
-			"ex1": "['3C','2C','10H','10D','10S']",
-			"ex2": "['2C','2C','QH','QD','QS']"
+			"ex1": {"hist": "['3C','2C','10H','10D','10S']",
+              "score": 6,
+              "count": 25
+              },
+			"ex2": {"hist": "['2C','2C','QH','QD','QS']",
+              "score": 6,
+              "count": 24
+              }
 		},
 		"not_triples": {
-			"ex1": "['3C','10H','10D','10S','2C']",
-			"ex2": "['QH','2C','QD','2C','QS']"
+			"ex1": {"hist": "['3C','10H','10D','10S','2C']",
+              "score": 0,
+              "count": 25
+              },
+
+			"ex2": {"hist": "['QH','2C','QD','2C','QS']",
+              "score": 0,
+              "count": 24
+              }
 			},
 		"quadruple": {
-			"ex1": "['3C','2C','10H','10D','10S','10C']",
-			"ex2": "['2C','2C','QH','QD','QS', 'QC']"
+			"ex1": {"hist": "['10C','4C','2H','2D','2S','2C']",
+              "score": 12,
+              "count": 22
+              },
+			"ex2": {"hist": "['3C','3C','AH','AD','AS','AC']",
+              "score": 12,
+              "count": 10
+              }
 			},
 		"straight_2": {
-			"ex1": "['AS','2H']",
-			"ex2": "['JH','10S']"
+			"ex1": {"hist": "['AS','2H']",
+              "score": 12,
+              "count": 10
+              },
+			"ex2": {"hist": "['JH','10S']",
+              "score": 12,
+              "count": 10
+              }
 			},
 		"straight_3": {
-			"ex1": "['9S','10H','JH']",
-			"ex2": "['JH','QS','KH']"
+			"ex1": {"hist": "['9S','10H','JH']",
+              "score": 12,
+              "count": 10
+              },
+			"ex2": {"hist": "['JH','QS','KH']",
+              "score": 12,
+              "count": 10
+              }
 			},
 		"straight_7": {
-			"ex1": "['AH','2S','3C','4S','5S','6D','7C']",
-			"ex2": "['AH','4S','2C','3S','5S','7D','6C']"
+			"ex1": {"hist": "['AH','2S','3C','4S','5S','6D','7C']",
+              "score": 12,
+              "count": 10
+              },
+			"ex2": {"hist": "['AH','4S','2C','3S','5S','7D','6C']",
+              "score": 12,
+              "count": 10
+              }
 			}
 
-	},
-	"functional_test_1" : {
-		"intialized_deck": "['3D', '7H', '6C', '7D', 'QS', '7C', 'KH', '5S', '5H', '8S', '2S', 'JC', 'JS', 'KC', '8C', 'KD', '8D', '3H', 'AS', 'AC', '10H', '9D', '6S', '5D', 'JH', 'QD', 'JD', '4H', '4S', '10C', '6H', '7S', '8H', '6D', 'KS', '2D', '2H','QH', '3S', '5C', 'QC', '9H', '10S', 'AD', '9C', 'AH', '10D', '2C', '4D', '3C','4C', '9S']"
 	}
+
 }

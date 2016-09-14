@@ -2,7 +2,7 @@ import unittest
 from random import shuffle
 from deck import CribDeck
 from cribplay import CribGame
-from cribbage_scoring import CribScore
+from cribbage_scoring import CribHandScore, CribPegScore
 
 class TestDeck(unittest.TestCase):
     """
@@ -103,7 +103,7 @@ class TestHandScoring(unittest.TestCase):
     """
     with open('gameplay/test_files/test_hands.txt', 'r') as th:
         test_hands = eval(th.read())['handscore']
-    cs = CribScore(score_type='hand')
+    cs = CribHandScore(score_type='hand')
     def test_hand_fifteen(self):
         for key, example in self.test_hands['fifteen'].iteritems():
             self.assertEqual(self.cs.score(eval(example)), 2)
@@ -162,6 +162,21 @@ class TestHandScoring(unittest.TestCase):
                 turn = eval(self.test_hands['29 point']['turn_' + key])
                 score = self.cs.score(eval(example), turn)
                 self.assertEqual(score, 29)
+
+class TestPegScoring(unittest.TestCase):
+    with open('gameplay/test_files/test_hands.txt', 'r') as th:
+        test_hands = eval(th.read())['pegscore']
+    def test_peg_scoring(self):
+        for ex_type, test_set in self.test_hands.iteritems():
+            for example in test_set.values():
+                cps = CribPegScore(eval(example['hist']))
+                self.assertEqual(cps.score,
+                                example['score'],
+                                "%s != %s, example: %s" % (cps.score,
+                                                            example['score'],
+                                                            ex_type))
+                if count in example:
+                    self.assertEqual(cps.count, example(['count']))
 
 
 
