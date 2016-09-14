@@ -97,7 +97,6 @@ class TestGamePlay(unittest.TestCase):
 
         self.assertTrue(type(new_status['faceup']) is str)
         self.assertEqual(len(new_status['deck']), 39)
-    @unittest.skip("demonstrating skipping")
     def test_pegging(self):
         cg = CribGame()
         old_status = self.test_status['test_pegging'][0]
@@ -107,7 +106,6 @@ class TestGamePlay(unittest.TestCase):
             else:
                 response = play['test_response']
                 new_status = cg.update(old_status, response)
-                print new_status
                 self.assertEqual(new_status['scores'], play['scores'])
                 self.assertEqual(new_status['peg_hist'], play['peg_hist'])
                 self.assertEqual(new_status['pegger'], play['pegger'])
