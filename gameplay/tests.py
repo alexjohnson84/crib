@@ -172,11 +172,17 @@ class TestPegScoring(unittest.TestCase):
                 cps = CribPegScore(eval(example['hist']))
                 self.assertEqual(cps.score,
                                 example['score'],
-                                "%s != %s, example: %s" % (cps.score,
+                                "%s != %s, example: %s for hist %s" % (cps.score,
                                                             example['score'],
-                                                            ex_type))
-                if count in example:
-                    self.assertEqual(cps.count, example(['count']))
+                                                            ex_type,
+                                                            example['hist']))
+                if 'count' in example:
+                    self.assertEqual(cps.count,
+                                    example['count'],
+                                    "%s != %s, example: %s for hist %s" % (cps.count,
+                                                                example['count'],
+                                                                ex_type,
+                                                                example['hist']))
 
 
 

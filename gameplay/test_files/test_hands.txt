@@ -68,6 +68,53 @@
 	},
 	"pegscore": {
 
+    "fifteen": {
+      "ex1": {"hist": "['10S','5H']",
+              "score": 2,
+              "count": 15
+              },
+      "ex2": {"hist": "['2H','7S','6H']",
+              "score": 2,
+              "count": 15
+              },
+    },
+    "thirty_one": {
+      "ex1": {"hist": "['KS','KH','KH','AS']",
+              "score": 2,
+              "count": 31
+              },
+      "ex2": {"hist": "['KS','2H','KH','9S']",
+              "score": 2,
+              "count": 31
+              }
+    },
+    "GO": {
+      "ex1": {"hist": "['KS','KH','2H','GO']",
+              "score": 1,
+              "count": 0
+              },
+      "ex2": {"hist": "['KS','2H','KH','8H','GO']",
+              "score": 1,
+              "count": 0
+              }
+    },
+    "last_card": {
+      "ex1": {"hist": "['KS','KH','2H','8S','GO','5S','2H','2H','QH']",
+              "score": 1,
+              "count": 19
+              },
+      "ex2": {"hist": "['2H', '2S', '4D', '6H', 'AS', '3S', 'AD', '10D']",
+              "score": 1,
+              "count": 29
+              }
+    },
+    "hist_reset_31": {
+      "ex1": {"hist": "['KS','2H','KH','9H','2H']",
+              "score": 0,
+              "count": 2
+              },
+    },
+
 		"doubles": {
 			"ex1": {"hist": "['10S','10H']",
               "score": 2,
@@ -93,24 +140,24 @@
               }
 		},
 		"triples": {
-			"ex1": {"hist": "['3C','2C','10H','10D','10S']",
+			"ex1": {"hist": "['3C','2C','7H','7D','7S']",
+              "score": 6,
+              "count": 26
+              },
+			"ex2": {"hist": "['2C','2C','7H','7D','7S']",
               "score": 6,
               "count": 25
-              },
-			"ex2": {"hist": "['2C','2C','QH','QD','QS']",
-              "score": 6,
-              "count": 24
               }
 		},
 		"not_triples": {
-			"ex1": {"hist": "['3C','10H','10D','10S','2C']",
+			"ex1": {"hist": "['3C','7H','7D','7S','2C']",
               "score": 0,
-              "count": 25
+              "count": 26
               },
 
-			"ex2": {"hist": "['QH','2C','QD','2C','QS']",
+			"ex2": {"hist": "['8H','2C','8D','2C','8S']",
               "score": 0,
-              "count": 24
+              "count": 28
               }
 			},
 		"quadruple": {
@@ -125,32 +172,32 @@
 			},
 		"straight_2": {
 			"ex1": {"hist": "['AS','2H']",
-              "score": 12,
-              "count": 10
+              "score": 0,
+              "count": 3
               },
 			"ex2": {"hist": "['JH','10S']",
-              "score": 12,
-              "count": 10
+              "score": 0,
+              "count": 20
               }
 			},
 		"straight_3": {
 			"ex1": {"hist": "['9S','10H','JH']",
-              "score": 12,
-              "count": 10
+              "score": 3,
+              "count": 29
               },
 			"ex2": {"hist": "['JH','QS','KH']",
-              "score": 12,
-              "count": 10
+              "score": 3,
+              "count": 30
               }
 			},
 		"straight_7": {
 			"ex1": {"hist": "['AH','2S','3C','4S','5S','6D','7C']",
-              "score": 12,
-              "count": 10
+              "score": 7,
+              "count": 28
               },
 			"ex2": {"hist": "['AH','4S','2C','3S','5S','7D','6C']",
-              "score": 12,
-              "count": 10
+              "score": 7,
+              "count": 28
               }
 			}
 

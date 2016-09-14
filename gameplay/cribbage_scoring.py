@@ -108,32 +108,40 @@ class CribPegScore(object):
     def __init__(self, history):
         with open('gameplay/reference_files/value_map.txt', 'r') as vm:
             self.value_map = eval(vm.read())
-        r_hist = history[::-1]
-        if 'GO' in history:
-            r_hist = r_hist[r_hist.find('GO'):]
-        self.mapped_sequence = \
-                    [self.value_map['sequence'][val[:-1]] for val in history]
+        self.r_hist = history[::-1]
         self.history = history
+        if 'GO' in history:
+            self.r_hist = self.r_hist[:self.r_hist.index('GO')]
+        self.mapped_sequence = \
+                [self.value_map['sequence'][val[:-1]] for val in self.r_hist]
         self.score = self._score_peg()
         self.count = self.check_count()
+        #check for 15/31 counts
         if self.count == 15 or self.count == 31:
             self.score += 2
+        #check for 'GO'
         if self.history[-1] == 'GO':
+            self.score += 1
+        #check for last card
+        self.num_cards_played = \
+                len([card for card in self.history if card != 'GO'])
+        if self.num_cards_played == 8:
             self.score += 1
 
 
     def _score_peg(self):
         score = 0
-        score += self._check_pair_points(self.history)
-        score += self._check_if_straight(self.history)
+        if len(self.r_hist) > 0:
+            score += self._check_pair_points(self.r_hist)
+            score += self._check_if_straight(self.r_hist)
         return score
 
     def _check_pair_points(self, lst):
         mapped_pair = {2:2, 3:6, 4:12}
-        last_card = lst[0]
+        last_card = lst[0][:-1]
         max_pair = 0
         for value in lst:
-            if value == last_card:
+            if value[:-1] == last_card:
                 max_pair += 1
             else:
                 break
@@ -147,17 +155,30 @@ class CribPegScore(object):
         Setup sliding window and find lengths of lists that are valid runs.
         return highest valid length of list
         """
-        valid_runs = []
-        for i in range(3,len(lst)):
+        valid_runs = [True] * len(lst)
+        for i in range(3,len(lst)+1):
             sorted_seq = sorted(self.mapped_sequence[:i])
             for j in range(1,len(sorted_seq)):
-                if sorted_seq[j-1] != 1:
-                    break
-            valid_runs.append(i)
-        if len(valid_runs) == 0:
-            return 0
+                if sorted_seq[j] - sorted_seq[j-1] != 1:
+                    valid_runs[i-1] = False
+        #find last occurence
+        neg_index = valid_runs[::-1].index(True)
+        longest_run = len(lst)-neg_index
+        if longest_run >= 3:
+            return longest_run
         else:
-            return max(valid_runs)
+            return 0
 
     def check_count(self):
-        return sum(self.mapped_sequence)
+        """
+        Check the current count
+        History is sliced on the last 'GO', but if the count reaches 31
+        there is not a 'GO' contained in the history.  We reduce the count by
+        31 each time this happens
+        """
+        card_points = \
+            [self.value_map['numbers'][val[:-1]] for val in self.r_hist[::-1]]
+        total = sum(card_points)
+        while total > 31:
+            total -= 31
+        return total
