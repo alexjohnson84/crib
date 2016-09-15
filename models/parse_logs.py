@@ -20,7 +20,7 @@ class BuildBaseTables(object):
                     score_diff = [sc - prevsc for sc, prevsc in zip(scores, prev_score)]
                     prev_score = scores
                     for player in range(2):
-                        line = [hands[player], scores_diff[player], dealer == player]
+                        line = [hands[player], score_diff[player], dealer == player]
                         abt.append(line)
         with open(output_path ,'w') as f:
             writer = csv.writer(f)
@@ -28,9 +28,9 @@ class BuildBaseTables(object):
 
     def assemble_peg_base_table(self, output_path):
         abt = [['hand', 'cards_played', 'peg_history', 'len_opponent', 'count', 'score']]
+        cnt = 0
         for game_key, game_val in self.logs.iteritems():
             round_nums = sorted([int(key) for key in game_val.keys()])
-            prev_score = [0,0]
             for i in round_nums:
                 i = str(i)
                 if 'Round Complete' in game_val[i]:
@@ -38,6 +38,7 @@ class BuildBaseTables(object):
                     prev_score = game_val[i]['Turn']['scores']
                     for j in peg_nums:
                         j = str(j)
+                        cnt += 1
                         pegger = game_val[i]['Pegging'][j]['pegger']
                         scores = game_val[i]['Pegging'][j]['scores']
                         score_diff = [sc - prevsc for sc, prevsc in zip(scores, prev_score)]

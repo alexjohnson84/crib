@@ -110,7 +110,9 @@ class CribGame(object):
                                     scores,
                                     hands,
                                     self.crib_deck.deck,
-                                    dealer = dealer
+                                    dealer = dealer,
+                                    peg_phist={0:[], 1:[]},
+                                    peg_hist=[]
                                     )
 
     def discard(self, status, response):
@@ -151,7 +153,9 @@ class CribGame(object):
                                     c_deck.deck,
                                     faceup,
                                     kitty=status['kitty'],
-                                    dealer=status['dealer'])
+                                    dealer=status['dealer'],
+                                    peg_phist={0:[], 1:[]},
+                                    peg_hist=[])
 
     def pegging(self, status, response):
         """
