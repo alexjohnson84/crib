@@ -34,6 +34,7 @@ def run_dummy_game():
     status = cg.update(status)
     while status['phase'] != 'Game Over':
         if status['phase'] == 'Pegging':
+            print status
             game_log[rnd][status['phase']][peg_rnd] = deepcopy(status)
             peg_rnd += 1
         else:
@@ -67,5 +68,5 @@ def run_multiple_games(n):
     with open('data/game_logs.txt', 'wt') as gl:
         json.dump(game_logs, gl, indent=4)
 if __name__ == "__main__":
-    run_multiple_games(2)
+    run_multiple_games(1)
     # run_dummy_game()

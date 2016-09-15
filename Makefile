@@ -4,5 +4,6 @@ test:
 
 generate:
 	python models/generate_data.py
+	python models/parse_logs.py
 clean:
-	rm data/game_logs.txt
+	rm data/*

@@ -53,7 +53,7 @@ class CribGame(object):
 
     def create_response(self, phase, scores, hands, deck, faceup=None,
                             peg_phist={0:[], 1:[]}, peg_hist=[], kitty=[], dealer=0,
-                            pegger=None):
+                            pegger=None, peg_count=0):
         """
         Constructor for status response variables
         returns data in the following form:
@@ -75,6 +75,7 @@ class CribGame(object):
         response_dict['kitty'] = kitty
         response_dict['dealer'] = dealer
         response_dict['pegger'] = pegger
+        response_dict['peg_count'] = peg_count
         return response_dict
 
     def switch_player(self, cur_player):
@@ -173,6 +174,7 @@ class CribGame(object):
 
             cps = CribPegScore(status['peg_hist'])
             scores[player] += cps.score
+            peg_count = cps.count
             return self.create_response(phase,
                                         scores,
                                         status['hands'],
@@ -182,7 +184,8 @@ class CribGame(object):
                                         dealer=status['dealer'],
                                         peg_hist=status['peg_hist'],
                                         peg_phist=status['peg_phist'],
-                                        pegger=player
+                                        pegger=player,
+                                        peg_count=peg_count
                                         )
         phase = 'Pegging Complete'
         hands = [status['peg_phist'][key] for key in [0,1]]
