@@ -19,13 +19,13 @@ class CribGame(object):
         Initialize object and set num players (currently only tested with two)
         """
         self.num_p = num_p
+        self.current_phase = None
     def update(self, status=None, response=None):
         """
         read in status and response variables, and actions upon them.
         Returns the status response variable to be actioned upon by the
         frontend
         """
-        self.current_phase = 'Nun'
         if status is not None:
             scores = status['scores']
         else:

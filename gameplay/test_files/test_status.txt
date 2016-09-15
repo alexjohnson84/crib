@@ -47,7 +47,7 @@
 			['10C', '6D', '9S', 'AC']
 		],
 		'faceup': '10S',
-		'phase': 'Score',
+		'phase': 'Round Complete',
 		'scores': [10, 10],
     'dealer': 0
 	},
