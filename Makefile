@@ -4,3 +4,5 @@ test:
 
 generate:
 	python models/generate_data.py
+clean:
+	rm data/game_logs.txt

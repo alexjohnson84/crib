@@ -27,21 +27,29 @@ class CribGame(object):
         """
         self.current_phase = 'Nun'
         if status is not None:
-            self.current_phase = status['phase']
-        if status == None:
-            updated_status = self.deal_hands()
-        elif self.current_phase == 'Score':
-            updated_status = self.deal_hands(status)
-        elif self.current_phase == 'Deal':
-            updated_status = self.discard(status, response)
-        elif self.current_phase == 'Discard':
-            updated_status = self.turn(status)
-        elif self.current_phase == 'Turn' or status['phase'] == 'Pegging':
-            updated_status = self.pegging(status, response)
-        elif self.current_phase == 'Pegging Complete':
-            updated_status = self.hand_scoring(status)
+            scores = status['scores']
+        else:
+            scores = [0,0]
+        if max(scores) <= 120:
+            if status is not None:
+                self.current_phase = status['phase']
+            if status == None:
+                updated_status = self.deal_hands()
+            elif self.current_phase == 'Round Complete':
+                updated_status = self.deal_hands(status)
+            elif self.current_phase == 'Deal':
+                updated_status = self.discard(status, response)
+            elif self.current_phase == 'Discard':
+                updated_status = self.turn(status)
+            elif self.current_phase == 'Turn' or status['phase'] == 'Pegging':
+                updated_status = self.pegging(status, response)
+            elif self.current_phase == 'Pegging Complete':
+                updated_status = self.hand_scoring(status)
+            return updated_status
+        else:
+            status['phase'] = 'Game Over'
+            return status
 
-        return updated_status
 
     def create_response(self, phase, scores, hands, deck, faceup=None,
                             peg_phist={0:[], 1:[]}, peg_hist=[], kitty=[], dealer=0,
@@ -137,7 +145,7 @@ class CribGame(object):
             scores[status['dealer']] += 2
 
         return self.create_response(phase,
-                                    status['scores'],
+                                    scores,
                                     status['hands'],
                                     c_deck.deck,
                                     faceup,
@@ -204,5 +212,7 @@ class CribGame(object):
                                     status['deck'],
                                     status['faceup'],
                                     kitty=status['kitty'],
+                                    peg_phist={0:[], 1:[]},
+                                    peg_hist=[],
                                     dealer=status['dealer'],
                                     )
