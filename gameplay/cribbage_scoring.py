@@ -19,6 +19,7 @@ class CribHandScore(object):
         self.hand = hand
         self.turn = turn
         if self.turn is not None:
+            print hand, turn
             self.full_hand = hand + turn
         else:
             self.full_hand = hand

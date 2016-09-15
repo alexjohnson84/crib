@@ -19,27 +19,26 @@ class CribGame(object):
         Initialize object and set num players (currently only tested with two)
         """
         self.num_p = num_p
-        self.current_status = None
     def update(self, status=None, response=None):
         """
         read in status and response variables, and actions upon them.
         Returns the status response variable to be actioned upon by the
         frontend
         """
-
+        self.current_phase = 'Nun'
         if status is not None:
-            self.current_status = status['phase']
+            self.current_phase = status['phase']
         if status == None:
             updated_status = self.deal_hands()
-        elif self.current_status == 'Score':
+        elif self.current_phase == 'Score':
             updated_status = self.deal_hands(status)
-        elif self.current_status == 'Deal':
+        elif self.current_phase == 'Deal':
             updated_status = self.discard(status, response)
-        elif self.current_status == 'Discard':
+        elif self.current_phase == 'Discard':
             updated_status = self.turn(status)
-        elif self.current_status == 'Turn' or status['phase'] == 'Pegging':
+        elif self.current_phase == 'Turn' or status['phase'] == 'Pegging':
             updated_status = self.pegging(status, response)
-        elif self.current_status == 'Pegging Complete':
+        elif self.current_phase == 'Pegging Complete':
             updated_status = self.hand_scoring(status)
 
         return updated_status
@@ -109,6 +108,7 @@ class CribGame(object):
         """
         Allow users to discard 2 cards from their hand, update
         status variables
+        Input: game status, discards as [[a,b],[x,y]]
         """
         phase = 'Discard'
         hands = status['hands']
@@ -177,7 +177,7 @@ class CribGame(object):
                                         pegger=player
                                         )
         phase = 'Pegging Complete'
-        hands = [status['p_hist'][key] for key in [0,1]]
+        hands = [status['peg_phist'][key] for key in [0,1]]
         return self.create_response(phase,
                                     scores,
                                     hands,
