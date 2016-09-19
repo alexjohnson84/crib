@@ -1,8 +1,12 @@
+from __future__ import division
+import math
 from gameplay.cribplay import CribGame
 import random
 import json
-from pprint import pprint
 from copy import deepcopy
+from multiprocessing import Pool
+from os import listdir
+import re
 
 def run_discard_model(hands):
     discards = []
@@ -24,7 +28,7 @@ def run_peg_model(hands, pegger, dealer):
         return None
     return random.choice(hands[player])
 
-def run_dummy_game():
+def run_dummy_game(_):
     cg = CribGame()
     rnd = 0
     peg_rnd = 0
@@ -62,7 +66,7 @@ def run_multiple_games(n):
     game_logs = {}
     file_count = 0
     for i in xrange(n):
-        game_logs[i] = run_dummy_game()
+        game_logs[i] = run_dummy_game(i)
         if i % 1000 == 0:
             print "processed %s of %i iterations" % (i, n)
         if i % 10000 == 0:
@@ -71,6 +75,35 @@ def run_multiple_games(n):
             json.dump(game_logs, gl, indent=4)
             game_logs = {}
             file_count += 0
+
+def run_para_games(n):
+    p = Pool(16)
+    data = p.map(run_dummy_game, range(n))
+    return data
+
+def get_highest_file(base_dir):
+    files = listdir(base_dir)
+    if len(files) > 0:
+        minimum_file = max([int(re.search(r'\d+', fil).group())
+                            for fil in files]) + 1
+    else:
+        minimum_file = 0
+    return minimum_file
+
+def run_multi_paras(batch_size=1000):
+    batch_num = get_highest_file('data/logs')
+    batch_data = run_para_games(batch_size)
+    with open('data/logs/para_game_%s.txt' % (batch_num), 'wt') as pg:
+        pg.write(str(batch_data))
+
+
+
+
+
+
+
 if __name__ == "__main__":
-    run_multiple_games(100000)
+    run_multi_paras()
+    # run_para_games(1000)
+    # run_multiple_games(100000)
     # run_dummy_game()

@@ -3,11 +3,12 @@ test:
 	python gameplay/tests.py
 
 generate:
-	python models/generate_data.py
+	seq 50 | xargs -Iz python models/generate_data.py
 	python models/parse_logs.py
 
 clean:
-	rm data/*
+	rm -rf data/*
+	mkdir data/logs
 
 build:
 	make clean
