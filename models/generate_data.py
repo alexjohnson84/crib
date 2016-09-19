@@ -62,10 +62,10 @@ def run_multiple_games(n):
     game_logs = {}
     for i in xrange(n):
         game_logs[i] = run_dummy_game()
-        # if i % 1000 == 0:
-        #     print "processed %s of %i iterations" % (i, n)
+        if i % 1000 == 0:
+            print "processed %s of %i iterations" % (i, n)
     with open('data/game_logs.txt', 'wt') as gl:
         json.dump(game_logs, gl, indent=4)
 if __name__ == "__main__":
-    run_multiple_games(100)
+    run_multiple_games(100000)
     # run_dummy_game()
