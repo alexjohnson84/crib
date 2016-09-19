@@ -60,12 +60,17 @@ def run_dummy_game():
 
 def run_multiple_games(n):
     game_logs = {}
+    file_count = 0
     for i in xrange(n):
         game_logs[i] = run_dummy_game()
         if i % 1000 == 0:
             print "processed %s of %i iterations" % (i, n)
-    with open('data/game_logs.txt', 'wt') as gl:
-        json.dump(game_logs, gl, indent=4)
+        if i % 10000 == 0:
+            print "writing to file"
+        with open('data/game_logs_%s.txt' % (file_count), 'wt') as gl:
+            json.dump(game_logs, gl, indent=4)
+            game_logs = {}
+            file_count += 0
 if __name__ == "__main__":
     run_multiple_games(100000)
     # run_dummy_game()
