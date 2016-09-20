@@ -21,10 +21,6 @@ class GenerateHandModel(object):
         self.df['hand'] = self.df['hand'].apply(lambda x: {key:1 for key in x})
         self.X = self.df['hand'].values
         self.y = self.df['score'].values
-    def hash_feats(self):
-        hasher = FeatureHasher(input_type='dict')
-        self.X = hasher.fit_transform(self.df['hand'])
-        self.y = self.df['score'].values
 
     def build_pipeline(self, X, y):
         self.dtr = Pipeline([
@@ -38,7 +34,6 @@ class GenerateHandModel(object):
         y = self.y[:length]
         self.X_train, self.X_test, self.y_train, self.y_test = \
                 train_test_split(X, y, test_size=0.33, random_state=42)
-        # self.dtr = DecisionTreeRegressor()
         self.build_pipeline(self.X_train, self.y_train)
 
     def score_model(self, length):
@@ -68,7 +63,7 @@ class GenerateHandModel(object):
         plt.savefig('graphs/cv_scores.png')
 
     def run_full_model(self, length):
-        self.dtr.fit(self.X[:length], self.y[:length])
+        self.build_pipeline(self.X[:length], self.y[:length])
 
 
 
@@ -81,10 +76,10 @@ class GenerateHandModel(object):
 
 def main(input_path, output_path):
     ghm = GenerateHandModel(input_path)
-    ghm.cross_score_model()
-    ghm.build_cv_graph()
+    # ghm.cross_score_model()
+    # ghm.build_cv_graph()
     ghm.run_full_model(10000)
     ghm.save_model(output_path)
 
 if __name__ == '__main__':
-    main('data/hand_base_table.txt', 'models/hand_model/model.pkl')
+    main('data/hand_base_table.txt', 'models/hand_model/test_model.pkl')

@@ -13,3 +13,6 @@ clean:
 build:
 	make clean
 	make generate
+
+play:
+	python app/app.py

@@ -90,10 +90,10 @@ def get_highest_file(base_dir):
         minimum_file = 0
     return minimum_file
 
-def run_multi_paras(batch_size=1000):
+def run_multi_paras(batch_size=1):
     batch_num = get_highest_file('data/logs')
     batch_data = run_para_games(batch_size)
-    with open('data/logs/para_game_%s.txt' % (batch_num), 'wt') as pg:
+    with open('data/logs/test_para_game_%s.txt' % (batch_num), 'wt') as pg:
         pg.write(str(batch_data))
 
 
