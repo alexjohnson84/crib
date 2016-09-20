@@ -52,7 +52,7 @@ class CribGame(object):
 
 
     def create_response(self, phase, scores, hands, deck, faceup=None,
-                            peg_phist={0:[], 1:[]}, peg_hist=[], kitty=[], dealer=0,
+                            peg_phist={'0':[], '1':[]}, peg_hist=[], kitty=[], dealer=0,
                             pegger=None, peg_count=0):
         """
         Constructor for status response variables
@@ -111,7 +111,7 @@ class CribGame(object):
                                     hands,
                                     self.crib_deck.deck,
                                     dealer = dealer,
-                                    peg_phist={0:[], 1:[]},
+                                    peg_phist={'0':[], '1':[]},
                                     peg_hist=[]
                                     )
 
@@ -154,7 +154,7 @@ class CribGame(object):
                                     faceup,
                                     kitty=status['kitty'],
                                     dealer=status['dealer'],
-                                    peg_phist={0:[], 1:[]},
+                                    peg_phist={'0':[], '1':[]},
                                     peg_hist=[],
                                     pegger=self.switch_player(status['dealer'])
                                     )
@@ -169,14 +169,14 @@ class CribGame(object):
             player = status['pegger']
         else:
             player = self.switch_player(status['pegger'])
-        player_pegs = len(status['peg_phist'][player])
+        player_pegs = len(status['peg_phist'][str(player)])
         scores = status['scores']
         while player_pegs < 4:
             hand = status['hands'][player]
             selection = hand.pop(hand.index(response))
             #append as list in case of null list
             status['peg_hist'] += [selection]
-            status['peg_phist'][player] += [selection]
+            status['peg_phist'][str(player)] += [selection]
 
             cps = CribPegScore(status['peg_hist'])
             scores[player] += cps.score
@@ -194,7 +194,7 @@ class CribGame(object):
                                         peg_count=peg_count
                                         )
         phase = 'Pegging Complete'
-        hands = [status['peg_phist'][key] for key in [0,1]]
+        hands = [status['peg_phist'][key] for key in ['0','1']]
         return self.create_response(phase,
                                     scores,
                                     hands,
@@ -221,7 +221,7 @@ class CribGame(object):
                                     status['deck'],
                                     status['faceup'],
                                     kitty=status['kitty'],
-                                    peg_phist={0:[], 1:[]},
+                                    peg_phist={'0':[], '1':[]},
                                     peg_hist=[],
                                     dealer=status['dealer'],
                                     )

@@ -113,8 +113,8 @@ class TestGamePlay(unittest.TestCase):
                     self.assertEqual(set(new_status['hands'][i]),
                                      set(play['hands'][i])
                                      )
-                    self.assertEqual(set(new_status['peg_phist'][i]),
-                                     set(play['peg_phist'][i])
+                    self.assertEqual(set(new_status['peg_phist'][str(i)]),
+                                     set(play['peg_phist'][str(i)])
                                      )
                 old_status = new_status
 
