@@ -1,3 +1,32 @@
 .highlight {
     border: 5px solid yellow;
 }
+table.fixed {
+  table-layout:fixed;
+}
+table.fixed td {
+  overflow: hidden;
+  height:80;
+  border: 2px solid black;
+  text-align:center;
+}
+
+td.stats {
+  vertical-align:top;
+}
+
+p.score {
+  text-align:center;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+p.score.user {
+  color: blue;
+}
+p.score.opponent {
+  color: green;
+}
+
+p {
+  margin: .5em;
+}

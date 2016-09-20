@@ -1,39 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>{{ game_status['phase'] }}</h2>
-<table>
+<h4>{{ game_status['phase'] }}</h4>
+
+
+<table class="fixed">
+  <col width="60px" />
+  <col width="400px" />
+  <col width="90px" />
   <tr>
     <td>
-      Dealer
-      <br>
       {% if game_status['dealer'] %}
       {% else %}
-      1
+      <img src="{{ url_for('static', filename='assets/dealer_button.png') }}">
       {% endif %}
     </td>
     <td>
-    </td>
-    <td>
-      <h3>Your Hand:</h3>
+      <h3>Your Hand</h3>
       {% for card in game_status['hands'][0] %}
-      <img src='{{ card[1] }}' class = "discard" id='{{ card[0] }}' height='70', width='50', border=2>
+      <img src='{{ card[1] }}' class="{{ card_class }}" id='{{ card[0] }}' height='70', width='50', border=2>
       {% endfor %}
     </td>
-    <td>
+    <td class='stats'>
       <p>P1 Score</p>
-      <p style="text-align:right">{{ game_status['scores'][0]}}</p>
+      <p class='score user'>{{ game_status['scores'][0]}}</p>
     </td>
   </tr>
   <tr>
-    <td></td>
     <td></td>
     <td>
       {% for card in game_status['peg_phist']['0'] %}
         <img src='{{ card[1] }}' id='{{ card[0] }}' height='70', width='50', border=2>
       {% endfor %}
     </td>
-    <td>
+    <td class='stats'>
       <p>Faceup</p>
       {% if game_status['faceup'] %}
         <img src='{{ game_status['faceup'][0][1] }}' height='70', width='50', border=2>
@@ -42,35 +42,32 @@
   </tr>
   <tr>
     <td></td>
-    <td></td>
     <td>
       {% for card in game_status['peg_phist']['1'] %}
         <img src='{{ card[1] }}' id='{{ card[0] }}' height='70', width='50', border=2>
       {% endfor %}
     </td>
-    <td>
+    <td class='stats'>
       <p>Peg Count</p>
-      <p style="text-align:right">{{ game_status['peg_count']}}</p>
+      <p class='score'>{{ game_status['peg_count']}}</p>
     </td>
   </tr>
   <tr>
     <td>
       {% if game_status['dealer'] %}
-      1
+      <img src="{{ url_for('static', filename='assets/dealer_button.png') }}">
       {% else %}
       {% endif %}
     </td>
     <td>
-    </td>
-    <td>
-      <h3>Opponent's Hand:</h3>
+      <h3>Opponent's Hand</h3>
       {% for card in game_status['hands'][1] %}
       <img src='{{ card[1] }}' height='70', width='50', border=2>
       {% endfor %}
     </td>
-    <td>
+    <td class='stats'>
       <p>P2 Score</p>
-      <p style="text-align:right">{{ game_status['scores'][1]}}</p>
+      <p class='score opponent'>{{ game_status['scores'][1]}}</p>
     </td>
   </tr>
 </table>
@@ -82,6 +79,7 @@
 <p>{{ cue['cue'] }}</p>
 
 <button type="submit" form="card_acts">submit!</button>
+<h5><a href='/reset'>Restart Game</a></h5>
 <hr>
 {{ game_status }}
 <hr>

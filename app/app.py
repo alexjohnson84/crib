@@ -53,6 +53,7 @@ cg = CribGame()
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+
     if request.method == 'POST':
         session['discard_selection'] = request.values['discard_selection']
         return redirect(url_for('index'))
@@ -106,11 +107,21 @@ def index():
 @app.route('/crib', methods=['GET'])
 def crib():
     form = ResponseForm()
+    discard_rounds = ['Deal', 'Turn', 'Pegging']
+    if session['game_status']['phase'] in discard_rounds:
+        c_class = 'discard'
+    else:
+        c_class = ''
     return render_template('index.html',  game_status=session['game_status'],
                             true_status=session['true_status'],
                             form=form,
-                            cue=instructions[session['game_status']['phase']])
+                            cue=instructions[session['game_status']['phase']],
+                            card_class=c_class)
 
+@app.route('/reset', methods=['GET'])
+def reset():
+    session.clear()
+    return redirect(url_for('index'))
 if __name__ == '__main__':
     app.run(debug=True)
 
