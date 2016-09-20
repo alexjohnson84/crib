@@ -165,11 +165,13 @@ class CribGame(object):
         action
         """
         phase = 'Pegging'
-        if len(status['peg_hist']) == 0:
-            player = status['pegger']
-        else:
-            player = self.switch_player(status['pegger'])
+        # if len(status['peg_hist']) == 0:
+        #     player = status['pegger']
+        # else:
+        player = status['pegger']
         player_pegs = len(status['peg_phist'][str(player)])
+        print "player pegs is %s" % (player_pegs)
+        print status['peg_phist']
         scores = status['scores']
         while player_pegs < 4:
             hand = status['hands'][player]
@@ -181,6 +183,7 @@ class CribGame(object):
             cps = CribPegScore(status['peg_hist'])
             scores[player] += cps.score
             peg_count = cps.count
+            player = self.switch_player(status['pegger'])
             return self.create_response(phase,
                                         scores,
                                         status['hands'],

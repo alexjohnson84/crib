@@ -42,7 +42,7 @@ class GenerateHandModel(object):
         self.scores.append([length, train_score, test_score])
 
     def cross_score_model(self):
-        lengths = [10,100,1000, 10000]
+        lengths = [10,100, 1000, 10000, 100000, 2500000]
         start = time.time()
         for length in lengths:
             self.train_model(length)
@@ -52,6 +52,8 @@ class GenerateHandModel(object):
         lengths = [score[0] for score in self.scores]
         train = [score[1] for score in self.scores]
         test = [score[2] for score in self.scores]
+        with open('graphs/scores.txt', 'w') as sc:
+            sc.write(str(self.scores))
         print train, test
         plt.plot(lengths, train, color='Blue', label='Train')
         plt.plot(lengths, test, color = 'Red', label='Test')
@@ -62,7 +64,9 @@ class GenerateHandModel(object):
         plt.legend()
         plt.savefig('graphs/cv_scores.png')
 
-    def run_full_model(self, length):
+    def run_full_model(self, length=None):
+        if length == None:
+            length = len(self.X)
         self.build_pipeline(self.X[:length], self.y[:length])
 
 
@@ -76,9 +80,10 @@ class GenerateHandModel(object):
 
 def main(input_path, output_path):
     ghm = GenerateHandModel(input_path)
-    # ghm.cross_score_model()
-    # ghm.build_cv_graph()
-    ghm.run_full_model(10000)
+    ghm.cross_score_model()
+    ghm.build_cv_graph()
+    ghm.save_model(output_path)
+    ghm.run_full_model()
     ghm.save_model(output_path)
 
 if __name__ == '__main__':

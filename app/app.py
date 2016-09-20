@@ -4,6 +4,22 @@ from copy import deepcopy
 from forms import ResponseForm
 from itertools import combinations
 from sklearn.externals import joblib
+import random
+
+
+instructions = {'Deal': {'cue': 'Discard 2 Cards',
+                        'selection': 2},
+                'Discard': {'cue': 'Turn Over Card',
+                            'selection': 0},
+                'Turn': {'cue': 'Submit to Start Pegging',
+                        'selection': 0},
+                'Pegging': {'cue': 'Continue Pegging',
+                            'selection': 1},
+                'Pegging Complete': {'cue': 'Click to Score',
+                'selection': 0},
+                'Round Complete': {'cue': 'Click to Score',
+                'selection': 0}
+                }
 
 app = Flask(__name__, static_url_path='/app/static')
 app.config.from_object('config')
@@ -15,7 +31,6 @@ with open('app/static/mapping/card_dir.txt') as f:
 
 def lookup_cards(lst):
     card_paths = []
-    print lst
     for card in lst:
         card_paths.append([card, url_for('static', filename=img_map[card])])
     return card_paths
@@ -38,26 +53,60 @@ cg = CribGame()
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    if request.method == 'POST':
-        if 'discard_selection' in request.values:
-            user_reponse = request.values['discard_selection'].split(',')
-            opponent_response = find_best_combination(session['true_status']['hands'][1], session['true_status']['dealer'])
-            print opponent_response
-
-            session['true_status'] = cg.update(session['true_status'], [user_reponse, opponent_response])
-            print session['true_status']
-
-            session['game_status']['faceup'] = lookup_cards([session['true_status']['faceup']])
-    else:
+    obscure_hand = True
+    # check for existence
+    if 'true_status' not in session:
         session['true_status'] = cg.update()
-        game_status = deepcopy(session['true_status'])
+    elif session['true_status']['phase'] == 'Deal':
+        if request.method == 'POST':
+            if 'discard_selection' in request.values:
+                # import pdb; pdb.set_trace()
+                user_response = request.values['discard_selection'].split(',')
+                opponent_response = find_best_combination(session['true_status']['hands'][1], session['true_status']['dealer'])
+                session['true_status'] = cg.update(session['true_status'], [user_response, opponent_response])
+    elif session['true_status']['phase'] == 'Discard':
+        session['true_status'] = cg.update(session['true_status'])
+
+    # elif session['true_status']['phase'] == 'Turn':
+    #     session['true_status'] = cg.update(session['true_status'])
+    elif session['true_status']['phase'] in ['Pegging', 'Turn']:
+        print session['true_status']
+        if session['true_status']['pegger'] == 0:
+            user_response = request.values['discard_selection']
+            session['true_status'] = cg.update(session['true_status'], user_response)
+        if len(session['true_status']['hands'][1]) > 0:
+            opponent_response = random.choice(session['true_status']['hands'][1])
+        else:
+            opponent_response = None
+        session['true_status'] = cg.update(session['true_status'], opponent_response)
+    elif session['true_status']['phase'] == 'Pegging Complete':
+        session['true_status'] = cg.update(session['true_status'])
+        obscure_hand = False
+    elif session['true_status']['phase'] == 'Round Complete':
+        session['true_status'] = cg.update(session['true_status'])
+        obscure_hand = False
+
+
+    game_status = deepcopy(session['true_status'])
+    if obscure_hand == True:
         game_status['hands'][1] = ["BB"] * len(game_status['hands'][1])
-        game_status['hands'] = [lookup_cards(hand) for hand in game_status['hands']]
-        session['game_status'] = game_status
+    if session['true_status']['faceup'] is not None:
+        game_status['faceup'] = lookup_cards([game_status['faceup']])
+    if session['true_status']['phase'] == 'Round Complete':
+        #we render kitty where phist is for dealer
+        dealer = game_status['dealer']
+        game_status['peg_phist'][str(dealer)] = game_status['kitty']
+        
+    game_status['hands'] = [lookup_cards(hand) for hand in game_status['hands']]
+    game_status['peg_phist'] = {key:lookup_cards(val) for key,val in game_status['peg_phist'].iteritems()}
+    session['game_status'] = game_status
     form = ResponseForm()
 
 
-    return render_template('index.html',  game_status=session['game_status'], true_status=session['true_status'], form=form)
+    return render_template('index.html',  game_status=session['game_status'],
+                            true_status=session['true_status'],
+                            form=form,
+                            cue=instructions[session['game_status']['phase']])
 
 if __name__ == '__main__':
     app.run(debug=True)
