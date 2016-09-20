@@ -16,3 +16,8 @@ build:
 
 play:
 	python app/app.py
+
+build_config:
+	echo -n "SECRET_KEY = '" > config.py
+	hexdump -n 16 -v -e '/1 "%02X"' /dev/urandom >> config.py
+	echo "'" >> config.py
