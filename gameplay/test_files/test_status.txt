@@ -112,7 +112,7 @@
 		],
 		'scores': [0, 0],
     'kitty': ['4S', 'QH', '10S', 'AS'],
-    'dealer': 0
+    'dealer': 0,
 	},
   'test_pegging': [
     {
@@ -129,7 +129,7 @@
       'peg_hist': [],
       'kitty': [],
       'dealer': 1,
-      'pegger': None,
+      'pegger': 0,
   	},
     {
       'phase': 'Pegging',
@@ -173,9 +173,9 @@
       ],
       'scores': [2, 2],
       'kitty': ['4S', 'QH', '10S', 'AS'],
-      'dealer': 1,
       'peg_phist': {0: ['9H', '6S'], 1: ['6D']},
       'peg_hist': ['9H', '6D', '6S'],
+      'dealer': 1,
       'pegger': 0,
       'test_response': '6S'
     },
@@ -189,9 +189,9 @@
       ],
       'scores': [2, 4],
       'kitty': ['4S', 'QH', '10S', 'AS'],
-      'dealer': 1,
       'peg_phist': {0: ['9H', '6S'], 1: ['6D', '10C']},
       'peg_hist': ['9H', '6D', '6S', '10C'],
+      'dealer': 1,
       'pegger': 1,
       'test_response': '10C'
     },

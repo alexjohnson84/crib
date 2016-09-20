@@ -155,7 +155,9 @@ class CribGame(object):
                                     kitty=status['kitty'],
                                     dealer=status['dealer'],
                                     peg_phist={0:[], 1:[]},
-                                    peg_hist=[])
+                                    peg_hist=[],
+                                    pegger=self.switch_player(status['dealer'])
+                                    )
 
     def pegging(self, status, response):
         """
@@ -163,8 +165,8 @@ class CribGame(object):
         action
         """
         phase = 'Pegging'
-        if status['pegger'] == None:
-            player = self.switch_player(status['dealer'])
+        if len(status['peg_hist']) == 0:
+            player = status['pegger']
         else:
             player = self.switch_player(status['pegger'])
         player_pegs = len(status['peg_phist'][player])
