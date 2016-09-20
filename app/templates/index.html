@@ -75,13 +75,13 @@
   </tr>
 </table>
 
-<form id="card_acts" action="/index" method="POST" name="card_acts">
+<form id="card_acts" action="/index" method="POST" name="card_acts" onsubmit="return validate_form({{ cue['selection'] }});">
 {{ form.hidden_tag() }}
 {{ form.discard_selection }}
 <!-- {{ form.current_status }} -->
 <p>{{ cue['cue'] }}</p>
 
-<button type="submit" form="card_acts" onclick="submit_discards({{ cue['selection'] }});">submit!</button>
+<button type="submit" form="card_acts">submit!</button>
 <hr>
 {{ game_status }}
 <hr>

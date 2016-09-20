@@ -1,4 +1,4 @@
-from flask import Flask, session, render_template, url_for, request
+from flask import Flask, session, render_template, url_for, request, redirect
 from gameplay.cribplay import CribGame
 from copy import deepcopy
 from forms import ResponseForm
@@ -53,26 +53,26 @@ cg = CribGame()
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+    if request.method == 'POST':
+        session['discard_selection'] = request.values['discard_selection']
+        return redirect(url_for('index'))
     obscure_hand = True
     # check for existence
     if 'true_status' not in session:
         session['true_status'] = cg.update()
     elif session['true_status']['phase'] == 'Deal':
-        if request.method == 'POST':
-            if 'discard_selection' in request.values:
-                # import pdb; pdb.set_trace()
-                user_response = request.values['discard_selection'].split(',')
-                opponent_response = find_best_combination(session['true_status']['hands'][1], session['true_status']['dealer'])
-                session['true_status'] = cg.update(session['true_status'], [user_response, opponent_response])
+        if 'discard_selection' in session:
+            # import pdb; pdb.set_trace()
+            user_response = session['discard_selection'].split(',')
+            opponent_response = find_best_combination(session['true_status']['hands'][1], session['true_status']['dealer'])
+            session['true_status'] = cg.update(session['true_status'], [user_response, opponent_response])
     elif session['true_status']['phase'] == 'Discard':
         session['true_status'] = cg.update(session['true_status'])
 
-    # elif session['true_status']['phase'] == 'Turn':
-    #     session['true_status'] = cg.update(session['true_status'])
     elif session['true_status']['phase'] in ['Pegging', 'Turn']:
         print session['true_status']
         if session['true_status']['pegger'] == 0:
-            user_response = request.values['discard_selection']
+            user_response = session['discard_selection']
             session['true_status'] = cg.update(session['true_status'], user_response)
         if len(session['true_status']['hands'][1]) > 0:
             opponent_response = random.choice(session['true_status']['hands'][1])
@@ -96,13 +96,16 @@ def index():
         #we render kitty where phist is for dealer
         dealer = game_status['dealer']
         game_status['peg_phist'][str(dealer)] = game_status['kitty']
-        
+
     game_status['hands'] = [lookup_cards(hand) for hand in game_status['hands']]
     game_status['peg_phist'] = {key:lookup_cards(val) for key,val in game_status['peg_phist'].iteritems()}
     session['game_status'] = game_status
     form = ResponseForm()
+    return redirect(url_for('crib'))
 
-
+@app.route('/crib', methods=['GET'])
+def crib():
+    form = ResponseForm()
     return render_template('index.html',  game_status=session['game_status'],
                             true_status=session['true_status'],
                             form=form,
