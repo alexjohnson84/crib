@@ -37,20 +37,13 @@ def lookup_cards(lst):
 
 def find_best_combination(hand, is_dealer):
     combos = combinations(hand, 4)
-    max_score = 0
-    max_combo = None
-    for combo in combos:
-        combo = list(combo) + [str(bool(is_dealer))]
-        hand_dict = [{key:1 for key in combo}]
-        predicted_val = hand_model.predict(hand_dict)
-        if predicted_val > max_score:
-            max_score = predicted_val
-            max_combo = combo
+    # if session['legal_moves'] != 'null':
+    #     session['legal_moves'] = str(session['legal_moves'])[1:-1]
     return [card for card in hand if card not in max_combo]
 
 cg = CribGame()
 
-@app.route('/')
+
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     session['legal_moves'] = 'null'
@@ -104,6 +97,8 @@ def index():
         game_status['hands'][1] = ["BB"] * len(game_status['hands'][1])
     if session['true_status']['faceup'] is not None:
         game_status['faceup'] = lookup_cards([game_status['faceup']])
+    else:
+        game_status['faceup'] = lookup_cards(['BB'])
     if session['true_status']['phase'] == 'Round Complete':
         #we render kitty where phist is for dealer
         dealer = game_status['dealer']
@@ -115,7 +110,8 @@ def index():
     form = ResponseForm()
     return redirect(url_for('crib'))
 
-@app.route('/crib', methods=['GET'])
+@app.route('/')
+@app.route('/game', methods=['GET'])
 def crib():
     form = ResponseForm()
     discard_rounds = ['Deal', 'Turn', 'Pegging']
@@ -137,23 +133,3 @@ def reset():
     return redirect(url_for('index'))
 if __name__ == '__main__':
     app.run(debug=True)
-
-	# 'Deal': {
-	# 	'peg_count': 0,
-	# 	'deck': ['QD', 'JS', 'QH', '5H', '4H', '6H', 'AS', 'AC', '7C', '4C', '8H', '7H', '6S', '9H', '7S', '8S', 'QC', '2S', 'AD', 'KD', '4S', '5C', '10S', '7D', 'KH', 'JD', 'QS', 'KC', '9D', '3H', '2H', '9S', '10D', '3S', '8D', '5S', 'JH', '6C', 'JC', '4D'],
-	# 	'hands': [
-	# 		['6D', '3D', '9C', '5D', '2C', '10H'],
-	# 		['2D', '8C', '3C', '10C', 'KS', 'AH']
-	# 	],
-	# 	'kitty': [],
-	# 	'peg_phist': {
-	# 		0: [],
-	# 		1: []
-	# 	},
-	# 	'scores': [0, 0],
-	# 	'phase': 'Deal',
-	# 	'dealer': 0,
-	# 	'faceup': None,
-	# 	'pegger': None,
-	# 	'peg_hist': []
-	# },

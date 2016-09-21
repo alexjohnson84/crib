@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h4>{{ game_status['phase'] }}</h4>
-
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            Cribbage <small>Phase: {{ game_status['phase'] }}</small>
+        </h1>
+    </div>
+</div>
 
 <table class="fixed">
   <col width="60px" />
@@ -16,9 +21,8 @@
       {% endif %}
     </td>
     <td>
-      <h3>Your Hand</h3>
       {% for card in game_status['hands'][0] %}
-      <img src='{{ card[1] }}' class="{{ card_class }}" id='{{ card[0] }}' height='70', width='50', border=2>
+      <img src='{{ card[1] }}' class="{{ card_class }} card" id='{{ card[0] }}' height='70', width='50', border=2>
       {% endfor %}
     </td>
     <td class='stats'>
@@ -30,13 +34,13 @@
     <td></td>
     <td>
       {% for card in game_status['peg_phist']['0'] %}
-        <img src='{{ card[1] }}' id='{{ card[0] }}' height='70', width='50', border=2>
+        <img src='{{ card[1] }}' id='{{ card[0] }}' class='card' height='70', width='50', border=2>
       {% endfor %}
     </td>
     <td class='stats'>
-      <p>Faceup</p>
+      <!-- <p>Faceup</p> -->
       {% if game_status['faceup'] %}
-        <img src='{{ game_status['faceup'][0][1] }}' height='70', width='50', border=2>
+        <img src='{{ game_status['faceup'][0][1] }}' class='card' height='70', width='50', border=2>
       {% endif %}
     </td>
   </tr>
@@ -44,7 +48,7 @@
     <td></td>
     <td>
       {% for card in game_status['peg_phist']['1'] %}
-        <img src='{{ card[1] }}' id='{{ card[0] }}' height='70', width='50', border=2>
+        <img src='{{ card[1] }}' id='{{ card[0] }}' class='card' height='70', width='50', border=2>
       {% endfor %}
     </td>
     <td class='stats'>
@@ -60,9 +64,8 @@
       {% endif %}
     </td>
     <td>
-      <h3>Opponent's Hand</h3>
       {% for card in game_status['hands'][1] %}
-      <img src='{{ card[1] }}' height='70', width='50', border=2>
+      <img src='{{ card[1] }}' class='card' height='70', width='50', border=2>
       {% endfor %}
     </td>
     <td class='stats'>
@@ -86,6 +89,6 @@
 <hr>
 {{ mapping }}
 
-<script type="text/javascript" src="{{ url_for('static', filename='core.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/core.js') }}"></script>
 
 {% endblock %}

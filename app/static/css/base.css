@@ -6,8 +6,8 @@ table.fixed {
 }
 table.fixed td {
   overflow: hidden;
-  height:80;
-  border: 2px solid black;
+  height:100;
+  border: 2px solid gray;
   text-align:center;
 }
 
@@ -29,4 +29,8 @@ p.score.opponent {
 
 p {
   margin: .5em;
+}
+img.card {
+    border: 1px solid black;
+    margin: 2px 2px 2px 2px;
 }
