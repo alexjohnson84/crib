@@ -5,6 +5,7 @@ from forms import ResponseForm
 from itertools import combinations
 from sklearn.externals import joblib
 import random
+import datetime
 
 
 instructions = {'Deal': {'cue': 'Discard 2 Cards',
@@ -41,6 +42,20 @@ def find_best_combination(hand, is_dealer):
     #     session['legal_moves'] = str(session['legal_moves'])[1:-1]
     return [card for card in hand if card not in max_combo]
 
+def add_to_history(save=False):
+    if 'history' in session:
+        session['history'].append((session['true_status'],
+                                    datetime.datetime.now(),
+                                    session['discard_selection']))
+    else:
+        session['history'] = []
+    if save == True:
+        with open('data/user_logs.txt', 'a') as ul:
+            ul.write(session['history'])
+
+
+
+
 cg = CribGame()
 
 
@@ -51,6 +66,7 @@ def index():
         session['discard_selection'] = request.values['discard_selection']
         return redirect(url_for('index'))
     obscure_hand = True
+    save = False
     # check for existence
     if 'true_status' not in session:
         session['true_status'] = cg.update()
@@ -90,6 +106,7 @@ def index():
     elif session['true_status']['phase'] == 'Round Complete':
         session['true_status'] = cg.update(session['true_status'])
         obscure_hand = False
+        save = True
 
 
     game_status = deepcopy(session['true_status'])
@@ -108,6 +125,7 @@ def index():
     game_status['peg_phist'] = {key:lookup_cards(val) for key,val in game_status['peg_phist'].iteritems()}
     session['game_status'] = game_status
     form = ResponseForm()
+    add_to_history(save)
     return redirect(url_for('crib'))
 
 @app.route('/')
