@@ -1,5 +1,5 @@
 from flask import Flask, session, render_template, url_for, request, redirect
-from gameplay.cribplay import CribGame
+from gameplay.cribplay import CribGame, find_legal_moves
 from copy import deepcopy
 from forms import ResponseForm
 from itertools import combinations
@@ -53,7 +53,6 @@ cg = CribGame()
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-
     if request.method == 'POST':
         session['discard_selection'] = request.values['discard_selection']
         return redirect(url_for('index'))
@@ -75,12 +74,25 @@ def index():
         if session['true_status']['pegger'] == 0:
             user_response = session['discard_selection']
             session['true_status'] = cg.update(session['true_status'], user_response)
-        if len(session['true_status']['hands'][1]) > 0:
-            opponent_response = random.choice(session['true_status']['hands'][1])
+
+        opp_legal_moves = find_legal_moves(session['true_status']['peg_count'],
+                                            session['true_status']['hands'][1]
+                                            )
+        if len(opp_legal_moves) == 0:
+            opponent_response = ['GO']
         else:
-            opponent_response = None
+            opponent_response = random.choice(opp_legal_moves)
         session['true_status'] = cg.update(session['true_status'], opponent_response)
+        #user go
+        session['legal_moves'] = find_legal_moves(session['true_status']['peg_count'],
+                                        session['true_status']['hands'][0]
+                                        )
+        # run go automatically
+        if session['legal_moves'] == []:
+            session['true_status'] = cg.update(session['true_status'], ['GO'])
+        print "legal_moves are %s" % (session['legal_moves'])
     elif session['true_status']['phase'] == 'Pegging Complete':
+        session['legal_moves'] = None
         session['true_status'] = cg.update(session['true_status'])
         obscure_hand = False
     elif session['true_status']['phase'] == 'Round Complete':

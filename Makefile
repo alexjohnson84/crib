@@ -10,6 +10,7 @@ generate:
 clean:
 	rm -rf data/*
 	mkdir data/logs
+	find . -name \*.pyc -delete
 
 build:
 	make clean

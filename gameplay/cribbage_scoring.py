@@ -111,14 +111,14 @@ class CribPegScore(object):
         self.history = history
 
         self.r_hist = history[::-1]
-        if 'GO' in history:
+        if 'GO' in history and history.count('GO') % 2 == 0:
             self.r_hist = self.r_hist[:self.r_hist.index('GO')]
         #check if 31 has been met
         idx_start = self._find_seq_start(self.r_hist)
         self.r_hist = self.r_hist[:idx_start]
 
         self.mapped_sequence = \
-                [self.value_map['sequence'][val[:-1]] for val in self.r_hist]
+                [self.value_map['sequence'][val[:-1]] for val in self.r_hist if val != 'GO']
         self.score = self._score_peg()
         self.count = self.check_count()
         #check for 15/31 counts
@@ -142,7 +142,7 @@ class CribPegScore(object):
         return score
     def _find_seq_start(self, lst):
         card_points = \
-            [self.value_map['numbers'][val[:-1]] for val in lst]
+            [self.value_map['numbers'][val[:-1]] for val in lst if val != 'GO']
         idx_start = len(card_points)
         for i, card in enumerate(card_points):
             total = sum(card_points[len(card_points) - i:])
@@ -190,6 +190,6 @@ class CribPegScore(object):
         History is sliced on the last 'GO' and reduced to [] if 31 is met
         """
         card_points = \
-            [self.value_map['numbers'][val[:-1]] for val in self.r_hist]
+            [self.value_map['numbers'][val[:-1]] for val in self.r_hist if val != 'GO']
         total = sum(card_points)
         return total

@@ -1,6 +1,20 @@
 from deck import CribDeck
 from cribbage_scoring import CribHandScore, CribPegScore
 
+def find_legal_moves(count, hand):
+    if len(hand) == 0:
+        return []
+    with open('gameplay/reference_files/value_map.txt', 'r') as vm:
+        value_map = eval(vm.read())
+    card_points = \
+        [value_map['numbers'][val[:-1]] for val in hand]
+    print card_points
+    remaining_pts = 31 - count
+    legal_moves = [hand[i] for i, val in enumerate(card_points) \
+                                        if val <= remaining_pts]
+    return legal_moves
+
+
 class CribGame(object):
     """
     Main Class for Cribbage Gameplay.  Utilizes a status dict to allow
@@ -165,20 +179,19 @@ class CribGame(object):
         action
         """
         phase = 'Pegging'
-        # if len(status['peg_hist']) == 0:
-        #     player = status['pegger']
-        # else:
         player = status['pegger']
         player_pegs = len(status['peg_phist'][str(player)])
         print "player pegs is %s" % (player_pegs)
         print status['peg_phist']
         scores = status['scores']
-        while player_pegs < 4:
-            hand = status['hands'][player]
-            selection = hand.pop(hand.index(response))
-            #append as list in case of null list
-            status['peg_hist'] += [selection]
-            status['peg_phist'][str(player)] += [selection]
+        if player_pegs < 4:
+            if response != ['GO']:
+                hand = status['hands'][player]
+                selection = hand.pop(hand.index(response))
+                status['peg_phist'][str(player)] += [selection]
+                status['peg_hist'] += [selection]
+            else:
+                status['peg_hist'] += response
 
             cps = CribPegScore(status['peg_hist'])
             scores[player] += cps.score

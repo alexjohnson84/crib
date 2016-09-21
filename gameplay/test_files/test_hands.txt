@@ -89,17 +89,17 @@
               }
     },
     "GO": {
-      "ex1": {"hist": "['KS','KH','2H','GO']",
+      "ex1": {"hist": "['KS','KH','2H','GO', 'AH', 'GO']",
               "score": 1,
               "count": 0
               },
-      "ex2": {"hist": "['KS','2H','KH','8H','GO']",
+      "ex2": {"hist": "['KS','2H','KH','8H','GO', 'GO']",
               "score": 1,
               "count": 0
               }
     },
     "last_card": {
-      "ex1": {"hist": "['KS','KH','2H','8S','GO','5S','2H','2H','QH']",
+      "ex1": {"hist": "['KS','KH','2H','8S','GO', 'GO','5S','2H','2H','QH']",
               "score": 1,
               "count": 19
               },
