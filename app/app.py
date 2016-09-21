@@ -53,6 +53,7 @@ cg = CribGame()
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+    session['legal_moves'] = 'null'
     if request.method == 'POST':
         session['discard_selection'] = request.values['discard_selection']
         return redirect(url_for('index'))
@@ -70,7 +71,6 @@ def index():
         session['true_status'] = cg.update(session['true_status'])
 
     elif session['true_status']['phase'] in ['Pegging', 'Turn']:
-        print session['true_status']
         if session['true_status']['pegger'] == 0:
             user_response = session['discard_selection']
             session['true_status'] = cg.update(session['true_status'], user_response)
@@ -88,11 +88,10 @@ def index():
                                         session['true_status']['hands'][0]
                                         )
         # run go automatically
+        print 'legal_moves are %s' % (session['legal_moves'])
         if session['legal_moves'] == []:
             session['true_status'] = cg.update(session['true_status'], ['GO'])
-        print "legal_moves are %s" % (session['legal_moves'])
     elif session['true_status']['phase'] == 'Pegging Complete':
-        session['legal_moves'] = None
         session['true_status'] = cg.update(session['true_status'])
         obscure_hand = False
     elif session['true_status']['phase'] == 'Round Complete':
@@ -124,11 +123,13 @@ def crib():
         c_class = 'discard'
     else:
         c_class = ''
+
     return render_template('index.html',  game_status=session['game_status'],
                             true_status=session['true_status'],
                             form=form,
                             cue=instructions[session['game_status']['phase']],
-                            card_class=c_class)
+                            card_class=c_class,
+                            legal_moves=session['legal_moves'])
 
 @app.route('/reset', methods=['GET'])
 def reset():

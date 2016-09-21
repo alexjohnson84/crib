@@ -10,21 +10,49 @@ var discard = $('.discard').click(function(e) {
   }
 });
 
-function validate_form(n){
+function get_selection(){
   var discard_obj = document.getElementsByClassName("discard highlight");
   console.log(discard_obj);
   var selected_d = []
-  if (discard_obj.length != n){
+  for (i = 0; i < discard_obj.length; i++) {
+        selected_d.push(discard_obj[i].id);
+      }
+  return selected_d
+}
+
+
+function validate_input_length(n){
+  var selected_d = get_selection()
+  if (selected_d.length != n){
     alrt_msg = "Please only select ";
     alert(alrt_msg.concat(String(n), " cards"));
     return false;
   } else {
-    for (i = 0; i < discard_obj.length; i++) {
-          selected_d.push(discard_obj[i].id);
-        }
     document.getElementById('discard_selection').value = selected_d;
     return true;
   }
+}
+
+function validate_move(legal_moves){
+  console.log(legal_moves);
+
+  if (legal_moves == null) {
+    return true;
+  } else {
+    var move = get_selection()[0]
+    if (legal_moves.indexOf(move) >= 0){
+      return true;
+    } else {
+      alert('Illegal Move')
+      return false;
+    }
+  }
+}
+
+function validate_form(n, legal_moves){
+  var vil = validate_input_length(n);
+  var vm = validate_move(legal_moves);
+  return vil && vm;
 }
 
 

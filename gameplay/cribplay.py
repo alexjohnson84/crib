@@ -181,10 +181,9 @@ class CribGame(object):
         phase = 'Pegging'
         player = status['pegger']
         player_pegs = len(status['peg_phist'][str(player)])
-        print "player pegs is %s" % (player_pegs)
-        print status['peg_phist']
+        min_pegs = min([len(hand) for hand in status['peg_phist']])
         scores = status['scores']
-        if player_pegs < 4:
+        if min_pegs < 4:
             if response != ['GO']:
                 hand = status['hands'][player]
                 selection = hand.pop(hand.index(response))

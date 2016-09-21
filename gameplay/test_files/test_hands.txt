@@ -203,7 +203,17 @@
               "score": 7,
               "count": 28
               }
-			}
+			},
+    "misc": {
+      "ex1": {"hist": "['6C', 'QS', '6S', '2S', '3S', 'GO']",
+              "score": 1,
+              "count": 27
+              },
+      "ex2": {"hist": "['9D', '7D', '6S', 'AH', 'GO', 'AC', 'GO', '8D', 'JD', 'GO']",
+              "score": 1,
+              "count": 18
+              }
+    }
 
 	}
 

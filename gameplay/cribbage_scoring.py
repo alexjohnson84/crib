@@ -113,6 +113,9 @@ class CribPegScore(object):
         self.r_hist = history[::-1]
         if 'GO' in history and history.count('GO') % 2 == 0:
             self.r_hist = self.r_hist[:self.r_hist.index('GO')]
+        if history.count('GO') >= 3 and history.count('GO') % 2 == 1:
+            go_idxs = [i for i, move in enumerate(self.r_hist) if move == 'GO']
+            self.r_hist = self.r_hist[:go_idxs[1]]
         #check if 31 has been met
         idx_start = self._find_seq_start(self.r_hist)
         self.r_hist = self.r_hist[:idx_start]
@@ -141,8 +144,13 @@ class CribPegScore(object):
             score += self._check_if_straight(self.r_hist)
         return score
     def _find_seq_start(self, lst):
-        card_points = \
-            [self.value_map['numbers'][val[:-1]] for val in lst if val != 'GO']
+        card_points = []
+        for val in lst:
+            if val == 'GO':
+                card_points.append(0)
+            else:
+                card_points.append(self.value_map['numbers'][val[:-1]])
+
         idx_start = len(card_points)
         for i, card in enumerate(card_points):
             total = sum(card_points[len(card_points) - i:])
@@ -193,3 +201,10 @@ class CribPegScore(object):
             [self.value_map['numbers'][val[:-1]] for val in self.r_hist if val != 'GO']
         total = sum(card_points)
         return total
+
+if __name__ == '__main__':
+    hand = ['9D', '7D', '6S', 'AH', 'GO', 'AC', 'GO', '8D', 'JD', 'GO']
+    cps = CribPegScore(hand)
+    print cps.score
+    print cps.count
+    print cps.r_hist

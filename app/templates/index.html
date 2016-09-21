@@ -71,8 +71,7 @@
     </td>
   </tr>
 </table>
-
-<form id="card_acts" action="/index" method="POST" name="card_acts" onsubmit="return validate_form({{ cue['selection'] }});">
+<form id="card_acts" action="/index" method="POST" name="card_acts" onsubmit="return validate_form({{ cue['selection'] }}, {{ legal_moves }});">
 {{ form.hidden_tag() }}
 {{ form.discard_selection }}
 <!-- {{ form.current_status }} -->
@@ -87,5 +86,6 @@
 <hr>
 {{ mapping }}
 
-    <script type="text/javascript" src="{{ url_for('static', filename='core.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='core.js') }}"></script>
+
 {% endblock %}
