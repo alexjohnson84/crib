@@ -1,12 +1,13 @@
 from __future__ import division
-import math
-from gameplay.cribplay import CribGame
-import random
-import json
+from os import listdir
 from copy import deepcopy
 from multiprocessing import Pool
-from os import listdir
+import math
+import random
+import json
 import re
+from gameplay.cribplay import CribGame, find_legal_moves
+
 
 def run_discard_model(hands):
     discards = []
@@ -14,25 +15,25 @@ def run_discard_model(hands):
         discards.append(random.sample(hand, 2))
     return discards
 
-def run_peg_model(hands, pegger, dealer):
+
+def run_peg_model(status):
     """
-    Run model for the player that's going to go next.
-    In the beginning of the pegging method, players switch, so we run the model
-    for the next player.
+
     """
-    if pegger == None:
-        player = abs(dealer-1)
+    #outline for model to be implemented
+    hand = status['hands'][status['pegger']]
+    count = status['peg_count']
+    legal_moves = find_legal_moves(count, hand)
+    if len(legal_moves) == 0:
+        return ['GO']
     else:
-        player = abs(pegger - 1)
-    if len(hands[player]) == 0:
-        return None
-    return random.choice(hands[player])
+        return random.choice(hand)
 
 def run_dummy_game(_):
     cg = CribGame()
     rnd = 0
     peg_rnd = 0
-    game_log = {rnd:{}}
+    game_log = {rnd: {}}
     game_log[rnd]['Pegging'] = {}
     status = None
     status = cg.update(status)
@@ -54,13 +55,13 @@ def run_dummy_game(_):
             response = run_discard_model(hands)
             status = cg.update(status, response)
         elif status['phase'] == 'Turn' or status['phase'] == 'Pegging':
-            hands = status['hands']
-            response = run_peg_model(hands, status['pegger'], status['dealer'])
-            status = cg.update(status,response)
+            response = run_peg_model(status)
+            status = cg.update(status, response)
         else:
             status = cg.update(status)
     game_log[rnd][status['phase']] = deepcopy(status)
     return game_log
+
 
 def run_multiple_games(n):
     game_logs = {}
@@ -76,10 +77,12 @@ def run_multiple_games(n):
             game_logs = {}
             file_count += 0
 
+
 def run_para_games(n):
     p = Pool(16)
     data = p.map(run_dummy_game, range(n))
     return data
+
 
 def get_highest_file(base_dir):
     files = listdir(base_dir)
@@ -90,6 +93,7 @@ def get_highest_file(base_dir):
         minimum_file = 0
     return minimum_file
 
+
 def run_multi_paras(batch_size=1000):
     batch_num = get_highest_file('data/logs')
     batch_data = run_para_games(batch_size)
@@ -97,13 +101,6 @@ def run_multi_paras(batch_size=1000):
         pg.write(str(batch_data))
 
 
-
-
-
-
-
 if __name__ == "__main__":
     run_multi_paras()
-    # run_para_games(1000)
-    # run_multiple_games(100000)
-    # run_dummy_game()
+    # run_dummy_game(2)
