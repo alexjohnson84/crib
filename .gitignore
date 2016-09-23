@@ -1,5 +1,5 @@
 *.pyc
-models/hand_model/*
+models/*_model/*
 config.py
 data/logs/*
 data/*base_table.txt
