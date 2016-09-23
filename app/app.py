@@ -97,7 +97,6 @@ def index():
                                         session['true_status']['hands'][0]
                                         )
         # run go automatically
-        print 'legal_moves are %s' % (session['legal_moves'])
         if session['legal_moves'] == []:
             session['true_status'] = cg.update(session['true_status'], ['GO'])
     elif session['true_status']['phase'] == 'Pegging Complete':

@@ -29,7 +29,7 @@ def run_peg_model(status):
     else:
         return random.choice(hand)
 
-def run_dummy_game(_):
+def run_dummy_game(n):
     cg = CribGame()
     rnd = 0
     peg_rnd = 0
@@ -67,7 +67,7 @@ def run_multiple_games(n):
     game_logs = {}
     file_count = 0
     for i in xrange(n):
-        game_logs[i] = run_dummy_game(i)
+        game_logs[str(i)] = run_dummy_game(i)
         if i % 1000 == 0:
             print "processed %s of %i iterations" % (i, n)
         if i % 10000 == 0:
@@ -94,11 +94,12 @@ def get_highest_file(base_dir):
     return minimum_file
 
 
-def run_multi_paras(batch_size=1000):
+def run_multi_paras(batch_size=2000):
     batch_num = get_highest_file('data/logs')
     batch_data = run_para_games(batch_size)
     with open('data/logs/para_game_%s.txt' % (batch_num), 'wt') as pg:
-        pg.write(str(batch_data))
+        # pg.write(str(batch_data))
+        json.dump(batch_data, pg)
 
 
 if __name__ == "__main__":

@@ -1,33 +1,51 @@
-import pandas as pd
-from sklearn.feature_extraction import FeatureHasher
+import numpy as np
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.feature_extraction import DictVectorizer
 from sklearn.cross_validation import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.pipeline import Pipeline
+from sklearn.pipeline import FeatureUnion
 from sklearn.externals import joblib
 from matplotlib import pyplot as plt
 import time
+from utils import ItemSelector, PegFeatureExtractor
 
-
-class GenerateHandModel(object):
+class GeneratePegModel(object):
 
     def __init__(self, path):
-        self.df = pd.read_csv(path)
-        self.scores = []
+        with open(path, 'r') as pbt:
+            self.headers = pbt.readline().split(',')
+            self.peg_data = []
+            cnt = 0
+            for line in pbt:
+                self.peg_data.append(list(eval(line)))
+                cnt += 1
+                if cnt == 1000000:
+                    break
         self.transform()
+        self.scores = []
+
 
     def transform(self):
-        self.df['hand'] = self.df['hand'].apply(lambda x: eval(x))
-        self.df['hand'] += self.df['dealer'].apply(lambda x: [str(x)])
-        self.df['hand'] = self.df['hand'].apply(
-            lambda x: {key: 1 for key in x})
-        self.X = self.df['hand'].values
-        self.y = self.df['score'].values
+        self.X = self.peg_data
+        self.y = np.array([line.pop(5) for line in self.peg_data])
 
     def build_pipeline(self, X, y):
         self.dtr = Pipeline([
-            ('feature_hashing', FeatureHasher(input_type='dict')),
-            ('dtr', DecisionTreeRegressor())
-        ])
+                            ('featureextract', PegFeatureExtractor()),
+                            ('union', FeatureUnion(
+                                transformer_list=[
+                                        ('pegcount', ItemSelector(key='X_cnt')),
+                                        ('opponentlength', ItemSelector(key='X_lo')),
+                                        ('cardsplayed', ItemSelector(key='X_cp')),
+                                        ('transformed_feats', Pipeline([
+                                                    ('selector', ItemSelector(key='X_dict')),
+                                                    ('vect', DictVectorizer())
+                                                ]))
+                                            ])),
+                            ('dtr', DecisionTreeRegressor()),
+                            ('rfr', RandomForestRegressor(n_jobs=-1)),
+                                ])
         self.dtr.fit(X, y)
 
     def train_model(self, length):
@@ -43,9 +61,10 @@ class GenerateHandModel(object):
         self.scores.append([length, train_score, test_score])
 
     def cross_score_model(self):
-        lengths = [10, 100, 1000, 10000, 100000, 2500000]
+        lengths = [10, 100, 1000, 10000, 100000] # 1000000, 2000000, 3000000]#, 10000000]
         start = time.time()
         for length in lengths:
+            # import pdb; pdb.set_trace()
             self.train_model(length)
             self.score_model(length)
             print 'for length %s, duration has been %s' % \
@@ -55,7 +74,7 @@ class GenerateHandModel(object):
         lengths = [score[0] for score in self.scores]
         train = [score[1] for score in self.scores]
         test = [score[2] for score in self.scores]
-        with open('graphs/scores.txt', 'w') as sc:
+        with open('graphs/peg_scores.txt', 'w') as sc:
             sc.write(str(self.scores))
         print train, test
         plt.plot(lengths, train, color='Blue', label='Train')
@@ -77,12 +96,14 @@ class GenerateHandModel(object):
 
 
 def main(input_path, output_path):
-    ghm = GenerateHandModel(input_path)
+    ghm = GeneratePegModel(input_path)
     ghm.cross_score_model()
     ghm.build_cv_graph()
-    ghm.save_model(output_path)
-    ghm.run_full_model()
-    ghm.save_model(output_path)
+    # ghm.save_model(output_path)
+    # print "running full model"
+    # ghm.run_full_model()
+    # print "saving model"
+    # ghm.save_model(output_path)
 
 if __name__ == '__main__':
-    main('data/hand_base_table.txt', 'models/hand_model/test_model.pkl')
+    main('data/peg_base_table.txt', 'models/peg_model/test_model.pkl')

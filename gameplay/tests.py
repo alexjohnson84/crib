@@ -125,6 +125,14 @@ class TestGamePlay(unittest.TestCase):
         new_status = cg.update(old_status)
         self.assertEqual(new_status['scores'], test_scores)
 
+class TestSpecialCases(unittest.TestCase):
+    def test_pegging_complete_transition(self):
+        with open('gameplay/test_files/test_special_cases.txt', 'r') as th:
+            old_status = eval(th.read())['test_pegging_complete_transition']
+        cg = CribGame()
+        new_status = cg.update(old_status, ['GO'])
+        self.assertEqual(new_status['phase'], 'Pegging Complete')
+
 
 class TestHandScoring(unittest.TestCase):
     """
@@ -212,6 +220,7 @@ class TestPegScoring(unittest.TestCase):
                                                                 example['count'],
                                                                 ex_type,
                                                                 example['hist']))
+
 
 
 

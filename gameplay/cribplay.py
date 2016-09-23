@@ -1,6 +1,7 @@
 from deck import CribDeck
 from cribbage_scoring import CribHandScore, CribPegScore
 
+
 def find_legal_moves(count, hand):
     if len(hand) == 0:
         return []
@@ -8,10 +9,9 @@ def find_legal_moves(count, hand):
         value_map = eval(vm.read())
     card_points = \
         [value_map['numbers'][val[:-1]] for val in hand]
-    print card_points
     remaining_pts = 31 - count
-    legal_moves = [hand[i] for i, val in enumerate(card_points) \
-                                        if val <= remaining_pts]
+    legal_moves = [hand[i] for i, val in enumerate(card_points)
+                   if val <= remaining_pts]
     return legal_moves
 
 
@@ -28,12 +28,14 @@ class CribGame(object):
     faceup: '4H',
     deck: [list of remaining cards]}
     """
+
     def __init__(self, num_p=2):
         """
         Initialize object and set num players (currently only tested with two)
         """
         self.num_p = num_p
         self.current_phase = None
+
     def update(self, status=None, response=None):
         """
         read in status and response variables, and actions upon them.
@@ -43,11 +45,11 @@ class CribGame(object):
         if status is not None:
             scores = status['scores']
         else:
-            scores = [0,0]
+            scores = [0, 0]
         if max(scores) <= 120:
             if status is not None:
                 self.current_phase = status['phase']
-            if status == None:
+            if status is None:
                 updated_status = self.deal_hands()
             elif self.current_phase == 'Round Complete':
                 updated_status = self.deal_hands(status)
@@ -64,10 +66,21 @@ class CribGame(object):
             status['phase'] = 'Game Over'
             return status
 
-
-    def create_response(self, phase, scores, hands, deck, faceup=None,
-                            peg_phist={'0':[], '1':[]}, peg_hist=[], kitty=[], dealer=0,
-                            pegger=None, peg_count=0):
+    def create_response(
+            self,
+            phase,
+            scores,
+            hands,
+            deck,
+            faceup=None,
+            peg_phist={
+                '0': [],
+                '1': []},
+            peg_hist=[],
+            kitty=[],
+            dealer=0,
+            pegger=None,
+            peg_count=0):
         """
         Constructor for status response variables
         returns data in the following form:
@@ -98,7 +111,7 @@ class CribGame(object):
         Input: int {0,1}
         Output: int {0,1} switched from current player
         """
-        return abs(cur_player-1)
+        return abs(cur_player - 1)
 
     def deal_hands(self, status=None):
         """
@@ -118,14 +131,14 @@ class CribGame(object):
             scores = status['scores']
             dealer = self.switch_player(status['dealer'])
         else:
-            scores = [0,0]
+            scores = [0, 0]
             dealer = 0
         return self.create_response(phase,
                                     scores,
                                     hands,
                                     self.crib_deck.deck,
-                                    dealer = dealer,
-                                    peg_phist={'0':[], '1':[]},
+                                    dealer=dealer,
+                                    peg_phist={'0': [], '1': []},
                                     peg_hist=[]
                                     )
 
@@ -148,6 +161,7 @@ class CribGame(object):
                                     status['deck'],
                                     kitty=kitty,
                                     dealer=status['dealer'])
+
     def turn(self, status):
         """
         cut card for the turn, store in status variable
@@ -157,7 +171,7 @@ class CribGame(object):
         faceup = c_deck.cut_card()
         scores = status['scores']
 
-        #extra 2 points for flipping a jack
+        # extra 2 points for flipping a jack
         if faceup[0] == 'J':
             scores[status['dealer']] += 2
 
@@ -168,7 +182,7 @@ class CribGame(object):
                                     faceup,
                                     kitty=status['kitty'],
                                     dealer=status['dealer'],
-                                    peg_phist={'0':[], '1':[]},
+                                    peg_phist={'0': [], '1': []},
                                     peg_hist=[],
                                     pegger=self.switch_player(status['dealer'])
                                     )
@@ -179,23 +193,25 @@ class CribGame(object):
         action
         """
         phase = 'Pegging'
-        player = status['pegger']
-        player_pegs = len(status['peg_phist'][str(player)])
-        min_pegs = min([len(hand) for hand in status['peg_phist']])
+        # import pdb; pdb.set_trace()
+        pegger = status['pegger']
+        player_pegs = len(status['peg_phist'][str(pegger)])
+        min_pegs = min([len(hand) for player, hand in
+                        status['peg_phist'].iteritems()])
         scores = status['scores']
         if min_pegs < 4:
             if response != ['GO']:
-                hand = status['hands'][player]
+                hand = status['hands'][pegger]
                 selection = hand.pop(hand.index(response))
-                status['peg_phist'][str(player)] += [selection]
+                status['peg_phist'][str(pegger)] += [selection]
                 status['peg_hist'] += [selection]
             else:
                 status['peg_hist'] += response
 
             cps = CribPegScore(status['peg_hist'])
-            scores[player] += cps.score
+            scores[pegger] += cps.score
             peg_count = cps.count
-            player = self.switch_player(status['pegger'])
+            pegger = self.switch_player(pegger)
             return self.create_response(phase,
                                         scores,
                                         status['hands'],
@@ -205,11 +221,11 @@ class CribGame(object):
                                         dealer=status['dealer'],
                                         peg_hist=status['peg_hist'],
                                         peg_phist=status['peg_phist'],
-                                        pegger=player,
+                                        pegger=pegger,
                                         peg_count=peg_count
                                         )
         phase = 'Pegging Complete'
-        hands = [status['peg_phist'][key] for key in ['0','1']]
+        hands = [status['peg_phist'][key] for key in ['0', '1']]
         return self.create_response(phase,
                                     scores,
                                     hands,
@@ -219,6 +235,7 @@ class CribGame(object):
                                     dealer=status['dealer'],
                                     pegger=None
                                     )
+
     def hand_scoring(self, status):
         phase = 'Round Complete'
         scores = status['scores']
@@ -236,7 +253,13 @@ class CribGame(object):
                                     status['deck'],
                                     status['faceup'],
                                     kitty=status['kitty'],
-                                    peg_phist={'0':[], '1':[]},
+                                    peg_phist={'0': [], '1': []},
                                     peg_hist=[],
                                     dealer=status['dealer'],
                                     )
+if __name__ == '__main__':
+    old_status = {'peg_phist': {'1': [], '0': []}, 'peg_hist': [], 'scores': [0, 0], 'deck': ['JH', '2D', '10H', '5D', '9D', '8C', '5H', '5S', '6C', 'AD', 'JC', '5C', 'KC', '8H', '2S', 'KS', '10D', '8S', '2C', '3H', 'QS', '3S', '9C', '4D', 'AH', '4C', '3C', '3D', 'KD', '6H', 'QC', '2H', '7S', 'QD', '7H', 'JS', '7C', '8D', 'KH'], 'phase': 'Turn', 'pegger': 0, 'faceup': '7D', 'hands': [['9H', '4H', '6S', 'JD'], ['10C', '6D', '9S', 'AC']], 'kitty': [], 'dealer': 1}
+
+    cg = CribGame()
+    new_status = cg.update(old_status, '9H')
+    print new_status
