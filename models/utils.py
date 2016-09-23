@@ -1,5 +1,16 @@
 from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
+import os
+
+def append_dict_to_file(path, d):
+    if os.path.isfile(path):
+        with open(path, 'r') as f:
+            data = eval(f.read())
+            data = dict(data.items() + d.items())
+    else:
+        data = d
+    with open(path, 'w') as f:
+        f.write(str(data))
 
 class ItemSelector(BaseEstimator, TransformerMixin):
     """

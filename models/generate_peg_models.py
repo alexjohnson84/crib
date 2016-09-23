@@ -11,12 +11,9 @@ from sklearn.externals import joblib
 from matplotlib import pyplot as plt
 import seaborn as sns
 import time
-from utils import ItemSelector, PegFeatureExtractor
+import sys
+from utils import ItemSelector, PegFeatureExtractor, append_dict_to_file
 from collections import OrderedDict
-
-
-
-
 
 class GeneratePegModel(object):
 
@@ -32,7 +29,10 @@ class GeneratePegModel(object):
                     break
         self.transform()
         self.scores = []
-
+        self.models = {'dtr': DecisionTreeRegressor(),
+                    'br': BaggingRegressor(n_jobs=-1),
+                    'rfr': RandomForestRegressor(n_jobs=-1),
+                }
 
     def transform(self):
         self.X = self.peg_data
@@ -68,30 +68,19 @@ class GeneratePegModel(object):
         self.scores.append([length, train_score, test_score])
 
     def cross_score_model(self, mod_name):
-        lengths = [10, 100, 1000, 10000, 100000, 1000000]
+        lengths = [10, 100, 1000]
         start = time.time()
         for length in lengths:
-            # import pdb; pdb.set_trace()
             self.train_model(length, mod_name)
             self.score_model(length)
             print 'for length %s, duration has been %s' % \
                                                 (length, time.time() - start)
+        append_dict_to_file('graphs/peg_scores.txt', {mod_name:self.scores})
 
-    def build_cv_scores(self, mod_name):
-        lengths = [score[0] for score in self.scores]
-        train = [score[1] for score in self.scores]
-        test = [score[2] for score in self.scores]
-        with open('graphs/peg_scores.txt', 'a') as sc:
-            sc.write(str({mod_name : self.scores}))
-        print train, test
 
     def build_cv_graph(self, fig_loc):
-        with open('graphs/peg_scores.txt', 'r') as ps:
-            data = ps.read()
-            data = data.replace('}{', '},{')
-            data = eval('[' + data + ']')
-            data = reduce(lambda x,y: dict(x.items() + y.items()),data)
-
+        with open('graphs/peg_scores.txt', 'r') as hs:
+            data = eval(hs.read())
         color_list = ['red', 'green', 'blue']
         color_dict = {key:color_list[i] for i, key in enumerate(sorted(data.keys()))}
         for key, value in data.iteritems():
@@ -118,31 +107,22 @@ class GeneratePegModel(object):
         joblib.dump(self.dtr, output_path)
 
     def cv_pipeline_models(self):
-        self.models = {'dtr': DecisionTreeRegressor(),
-                    'br': BaggingRegressor(n_jobs=-1),
-                    'rfr': RandomForestRegressor(n_jobs=-1),
-                }
         for mod_name in self.models.keys():
             self.scores = []
             self.cross_score_model(mod_name)
-            self.build_cv_scores(mod_name)
         self.build_cv_graph('graphs/peg_cv_scores.png')
 
-
-
-
-def main(input_path, output_path):
+def main(input_path, output_path, cv=False):
     ghm = GeneratePegModel(input_path)
-    ghm.cv_pipeline_models()
-    ghm.run_full_model('br', 1000000)
-
-    # ghm.cross_score_model()
-    # ghm.build_cv_graph()
-    # ghm.save_model(output_path)
-    # print "running full model"
-    # ghm.run_full_model()
-    # print "saving model"
-    # ghm.save_model(output_path)
+    if cv == True:
+        ghm.cv_pipeline_models()
+    else:
+        ghm.run_full_model('br', 1000)
+        ghm.save_model(output_path)
 
 if __name__ == '__main__':
-    main('data/peg_base_table.txt', 'models/peg_model/test_model.pkl')
+    if len(sys.argv) > 1:
+        arg = bool(sys.argv[1])
+    else:
+        arg = False
+    main('data/peg_base_table.txt', 'models/peg_model/model.pkl', cv=arg)

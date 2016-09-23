@@ -12,9 +12,21 @@ clean:
 	mkdir data/logs
 	find . -name \*.pyc -delete
 
+model:
+	mkdir -p models/hand_model
+	mkdir -p models/peg_model
+	python models/generate_hand_models.py
+	python models/generate_peg_models.py
+
+model_cv:
+	rm -f graphs/*
+	python models/generate_peg_models.py True
+	python models/generate_hand_models.py True
+
 build:
 	make clean
 	make generate
+	make model
 
 play:
 	python app/app.py
