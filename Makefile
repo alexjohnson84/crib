@@ -3,7 +3,7 @@ test:
 	python gameplay/tests.py
 
 generate:
-	seq 50 | xargs -Iz python models/generate_data.py
+	seq 100 | xargs -Iz python models/generate_data.py
 	python models/parse_logs.py
 
 clean:
@@ -26,6 +26,7 @@ model_cv:
 build:
 	make clean
 	make generate
+	make model_cv
 	make model
 
 play:
@@ -41,3 +42,7 @@ install:
 	source cc_virt/bin/activate
 	pip install -r requirements.txt
 	make build_config
+
+full_build:
+	make install
+	make build

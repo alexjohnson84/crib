@@ -6,8 +6,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.externals import joblib
-# from matplotlib import pyplot as plt
-# import seaborn as sns
+from matplotlib import pyplot as plt
+import seaborn as sns
 from collections import OrderedDict
 import time
 import sys
@@ -52,7 +52,7 @@ class GenerateHandModel(object):
         self.scores.append([length, train_score, test_score])
 
     def cross_score_model(self, mod_name):
-        lengths = [10, 100, 1000, 10000, 100000] #, 2500000]
+        lengths = [10, 100, 1000, 10000, 100000, 1000000, 2500000, 4497780]
         start = time.time()
         for length in lengths:
             self.train_model(length, mod_name)
@@ -100,7 +100,7 @@ def main(input_path, output_path, cv=False):
     if cv == True:
         ghm.cv_pipeline_models()
     else:
-        ghm.run_full_model('br', 1000)
+        ghm.run_full_model('br')
         ghm.save_model(output_path)
 
 if __name__ == '__main__':

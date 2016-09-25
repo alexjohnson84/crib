@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 import time
 import sys
-from utils import ItemSelector, PegFeatureExtractor, append_dict_to_file
+from models.utils import ItemSelector, PegFeatureExtractor, append_dict_to_file
 from collections import OrderedDict
 
 class GeneratePegModel(object):
@@ -105,6 +105,9 @@ class GeneratePegModel(object):
 
     def save_model(self, output_path):
         joblib.dump(self.dtr, output_path)
+        # import pickle
+        # with open('models/peg_model.pkl', 'wb') as f:
+        #     pickle.dump(self.dtr, f)
 
     def cv_pipeline_models(self):
         for mod_name in self.models.keys():
