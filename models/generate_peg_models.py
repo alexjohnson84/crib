@@ -21,12 +21,8 @@ class GeneratePegModel(object):
         with open(path, 'r') as pbt:
             self.headers = pbt.readline().split(',')
             self.peg_data = []
-            cnt = 0
             for line in pbt:
                 self.peg_data.append(list(eval(line)))
-                cnt += 1
-                if cnt == 1000000:
-                    break
         self.transform()
         self.scores = []
         self.models = {'dtr': DecisionTreeRegressor(),
@@ -105,9 +101,6 @@ class GeneratePegModel(object):
 
     def save_model(self, output_path):
         joblib.dump(self.dtr, output_path)
-        # import pickle
-        # with open('models/peg_model.pkl', 'wb') as f:
-        #     pickle.dump(self.dtr, f)
 
     def cv_pipeline_models(self):
         for mod_name in self.models.keys():

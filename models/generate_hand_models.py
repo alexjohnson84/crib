@@ -5,18 +5,27 @@ from sklearn.ensemble import BaggingRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.pipeline import Pipeline
+from sklearn.pipeline import FeatureUnion
 from sklearn.externals import joblib
 from matplotlib import pyplot as plt
 import seaborn as sns
 from collections import OrderedDict
 import time
 import sys
-from utils import append_dict_to_file
+from models.utils import ItemSelector, HandFeatureExtractor, append_dict_to_file
 
 class GenerateHandModel(object):
 
     def __init__(self, path):
-        self.df = pd.read_csv(path)
+        with open(path, 'r') as hbt:
+            self.headers = hbt.readline().split(',')
+            self.hand_data = []
+            cnt = 0
+            for line in hbt:
+                self.hand_data.append(list(eval(line)))
+                cnt += 1
+                if cnt == 1000000:
+                    break
         self.scores = []
         self.transform()
         self.models = {'dtr': DecisionTreeRegressor(),
@@ -25,16 +34,20 @@ class GenerateHandModel(object):
                 }
 
     def transform(self):
-        self.df['hand'] = self.df['hand'].apply(lambda x: eval(x))
-        self.df['hand'] += self.df['dealer'].apply(lambda x: [str(x)])
-        self.df['hand'] = self.df['hand'].apply(
-            lambda x: {key: 1 for key in x})
-        self.X = self.df['hand'].values
-        self.y = self.df['score'].values
+        self.y = [hand.pop(1) for hand in self.hand_data]
+        self.X = self.hand_data
 
     def build_pipeline(self, X, y, mod_name):
         self.dtr = Pipeline([
-            ('feature_hashing', DictVectorizer()),
+            ('featureextract', HandFeatureExtractor()),
+            ('union', FeatureUnion(
+                transformer_list=[
+                        ('isdealer', ItemSelector(key='X_dealer')),
+                        ('hand', Pipeline([
+                                    ('selector', ItemSelector(key='X_hand')),
+                                    ('vect', DictVectorizer())
+                                ]))
+                            ])),
             ('mod', self.models[mod_name])
         ])
         self.dtr.fit(X, y)

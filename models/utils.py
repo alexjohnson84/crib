@@ -96,3 +96,25 @@ class PegFeatureExtractor(BaseEstimator, TransformerMixin):
         features['X_cp'] = np.array([float(line[1]) for line in peg_data]).reshape(-1, 1)
 
         return features
+
+class HandFeatureExtractor(BaseEstimator, TransformerMixin):
+    """
+    Custom Class to create a dict of numpy arrays to be acted upon by ItemSelector
+    Input: ABT of form ['hand', 'cards_played', 'peg_history', 'len_opponent', 'count']
+    Output:
+    dict of keys for features
+    'X_dict' = list of dicts with dictvectorized hashing
+    'X_cnt' = current count of peg round
+    'X_lo' = length of opponents hand
+    'X_cp' = length of cards played
+
+    """
+    headers = ['hand', 'dealer']
+    def fit(self, x, y=None):
+        return self
+
+    def transform(self, hand_data):
+        features = {}
+        features['X_hand'] = [{card:1 for card in line} for line in hand_data]
+        features['X_dealer'] = np.array([line[1] for line in hand_data]).reshape(-1, 1)
+        return features
