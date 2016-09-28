@@ -21,6 +21,8 @@ instructions = {'Deal': {'cue': 'Discard 2 Cards',
                 'Pegging Complete': {'cue': 'Click to Score',
                 'selection': 0},
                 'Round Complete': {'cue': 'Click to Score',
+                'selection': 0},
+                'Game Over': {'cue': 'End Of Game',
                 'selection': 0}
                 }
 
@@ -62,6 +64,8 @@ def find_best_peg(legal_moves, status):
 def extract_peg_features(status, move):
     # import pdb; pdb.set_trace()
     player = status['pegger']
+    print 'status', 'move', 'player'
+    print status['hands'], move, player
     hand = deepcopy(status['hands'][player]).remove(move)
     hist = status['peg_hist'] + [move]
     len_opponent = len(status['hands'][abs(player-1)])
@@ -107,13 +111,13 @@ def index():
         return redirect(url_for('index'))
     obscure_hand = True
     save = False
+    if 'true_status' in session:
+        print 'phase', session['true_status']['phase']
     # check for existence
-    # import pdb; pdb.set_trace()
     if 'true_status' not in session:
         session['true_status'] = cg.update()
     elif session['true_status']['phase'] == 'Deal':
         if 'discard_selection' in session:
-            # import pdb; pdb.set_trace()
             user_response = session['discard_selection'].split(',')
             opponent_response = find_best_combination(session['true_status']['hands'][1], session['true_status']['dealer'])
             session['true_status'] = cg.update(session['true_status'], [user_response, opponent_response])
@@ -127,29 +131,33 @@ def index():
     elif session['true_status']['phase'] in ['Pegging', 'Turn']:
         if session['true_status']['pegger'] == 0:
             user_response = session['discard_selection']
+            print session['discard_selection']
             session['true_status'] = cg.update(session['true_status'], user_response)
-
-        opponent_response = get_opponent_response(session['true_status'])
-        session['true_status'] = cg.update(session['true_status'], opponent_response)
+        if session['true_status']['phase'] != 'Pegging Complete':
+            opponent_response = get_opponent_response(session['true_status'])
+            session['true_status'] = cg.update(session['true_status'], opponent_response)
         #user go
         session['legal_moves'] = find_legal_moves(session['true_status']['peg_count'],
                                         session['true_status']['hands'][0]
                                         )
         # run go automatically
-        #this needs to be a while loop
         while session['legal_moves'] == []:
-            session['true_status'] = cg.update(session['true_status'], ['GO'])
+            if session['true_status']['phase'] != 'Pegging Complete':
+                # if len(session['true_status']['hands'][0]) < 0:
+                session['true_status'] = cg.update(session['true_status'], ['GO'])
+                opponent_response = get_opponent_response(session['true_status'])
+                session['true_status'] = cg.update(session['true_status'], opponent_response)
             session['legal_moves'] = find_legal_moves(session['true_status']['peg_count'],
                                                         session['true_status']['hands'][0]
                                                         )
-            opponent_response = get_opponent_response(session['true_status'])
-            session['true_status'] = cg.update(session['true_status'], opponent_response)
-            if sum([len(hand) for hand in session['true_status']['hands']]) <= 1:
-                break
+            print session['true_status']
+            print 'legal_moves', session['legal_moves']
+
+            # if sum([len(hand) for hand in session['true_status']['hands']]) <= 1:
+            #     break
         if session['true_status']['phase'] == 'Pegging Complete':
             session['legal_moves'] = 'null'
 
-        print "legal moves are ", session['legal_moves']
 
     elif session['true_status']['phase'] == 'Pegging Complete':
         session['legal_moves'] = 'null'
@@ -157,6 +165,8 @@ def index():
         session['true_status'] = cg.update(session['true_status'])
         obscure_hand = False
     elif session['true_status']['phase'] == 'Round Complete':
+        session['legal_moves'] = 'null'
+        print "legal moves are ", session['legal_moves']
         session['true_status'] = cg.update(session['true_status'])
         obscure_hand = False
         save = True
@@ -178,7 +188,7 @@ def index():
     game_status['peg_phist'] = {key:lookup_cards(val) for key,val in game_status['peg_phist'].iteritems()}
     session['game_status'] = game_status
     form = ResponseForm()
-    add_to_history(save)
+    # add_to_history(save)
     return redirect(url_for('crib'))
 
 @app.route('/')
@@ -191,8 +201,8 @@ def crib():
             c_class = 'discard'
         else:
             c_class = ''
-        with open('app/session_log.txt', 'w+') as f:
-            f.write(str(session))
+        # with open('app/session_log.txt', 'w+') as f:
+        #     f.write(str(session))
         return render_template('index.html',  game_status=session['game_status'],
                                 true_status=session['true_status'],
                                 form=form,

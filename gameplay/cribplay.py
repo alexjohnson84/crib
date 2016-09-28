@@ -201,6 +201,7 @@ class CribGame(object):
         scores = status['scores']
         if min_pegs < 4:
             if response != ['GO']:
+                # import pdb; pdb.set_trace()
                 hand = status['hands'][pegger]
                 selection = hand.pop(hand.index(response))
                 status['peg_phist'][str(pegger)] += [selection]
@@ -212,18 +213,20 @@ class CribGame(object):
             scores[pegger] += cps.score
             peg_count = cps.count
             pegger = self.switch_player(pegger)
-            return self.create_response(phase,
-                                        scores,
-                                        status['hands'],
-                                        status['deck'],
-                                        status['faceup'],
-                                        kitty=status['kitty'],
-                                        dealer=status['dealer'],
-                                        peg_hist=status['peg_hist'],
-                                        peg_phist=status['peg_phist'],
-                                        pegger=pegger,
-                                        peg_count=peg_count
-                                        )
+            if min([len(hand) for player, hand in
+                            status['peg_phist'].iteritems()]) != 4:
+                return self.create_response(phase,
+                                            scores,
+                                            status['hands'],
+                                            status['deck'],
+                                            status['faceup'],
+                                            kitty=status['kitty'],
+                                            dealer=status['dealer'],
+                                            peg_hist=status['peg_hist'],
+                                            peg_phist=status['peg_phist'],
+                                            pegger=pegger,
+                                            peg_count=peg_count
+                                            )
         phase = 'Pegging Complete'
         hands = [status['peg_phist'][key] for key in ['0', '1']]
         return self.create_response(phase,
@@ -233,7 +236,7 @@ class CribGame(object):
                                     status['faceup'],
                                     kitty=status['kitty'],
                                     dealer=status['dealer'],
-                                    pegger=None
+                                    pegger=pegger
                                     )
 
     def hand_scoring(self, status):

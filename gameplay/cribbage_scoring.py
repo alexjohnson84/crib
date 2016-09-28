@@ -133,6 +133,8 @@ class CribPegScore(object):
         # check for 15/31 counts
         if self.count == 15 or self.count == 31:
             self.score += 2
+        if self.count == 31:
+            self.r_hist = []
         # check for 'GO'
         if self.history[-1] == 'GO':
             self.score += 1
@@ -204,5 +206,5 @@ class CribPegScore(object):
         """
         card_points = [self.value_map['numbers'][val[:-1]]
                        for val in self.r_hist if val != 'GO']
-        total = sum(card_points)
+        total = sum(card_points) % 31
         return total
