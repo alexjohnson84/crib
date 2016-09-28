@@ -115,6 +115,7 @@ class HandFeatureExtractor(BaseEstimator, TransformerMixin):
 
     def transform(self, hand_data):
         features = {}
-        features['X_hand'] = [{card:1 for card in line} for line in hand_data]
+        print "hand data", hand_data[:5]
+        features['X_hand'] = [{card:1 for card in eval(line[0])} for line in hand_data]
         features['X_dealer'] = np.array([line[1] for line in hand_data]).reshape(-1, 1)
         return features

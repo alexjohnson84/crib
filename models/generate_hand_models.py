@@ -1,4 +1,3 @@
-import pandas as pd
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import BaggingRegressor
@@ -20,12 +19,8 @@ class GenerateHandModel(object):
         with open(path, 'r') as hbt:
             self.headers = hbt.readline().split(',')
             self.hand_data = []
-            cnt = 0
             for line in hbt:
                 self.hand_data.append(list(eval(line)))
-                cnt += 1
-                if cnt == 1000000:
-                    break
         self.scores = []
         self.transform()
         self.models = {'dtr': DecisionTreeRegressor(),
@@ -113,7 +108,7 @@ def main(input_path, output_path, cv=False):
     if cv == True:
         ghm.cv_pipeline_models()
     else:
-        ghm.run_full_model('br')
+        ghm.run_full_model('br', 10000)
         ghm.save_model(output_path)
 
 if __name__ == '__main__':

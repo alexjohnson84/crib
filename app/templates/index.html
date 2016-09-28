@@ -4,7 +4,7 @@
 <div class="row">
     <div class="col-lg-12">
         <h1 class="page-header">
-            Cribbage <small>Phase: {{ game_status['phase'] }}</small>
+            Cribbage <small id='game-phase'>Phase: {{ game_status['phase'] }}</small>
         </h1>
     </div>
 </div>
@@ -17,7 +17,7 @@
     <td>
       {% if game_status['dealer'] %}
       {% else %}
-      <img src="{{ url_for('static', filename='assets/dealer_button.png') }}">
+      <img id="dealer-p1" src="{{ url_for('static', filename='assets/dealer_button.png') }}">
       {% endif %}
     </td>
     <td>
@@ -53,13 +53,13 @@
     </td>
     <td class='stats'>
       <p>Peg Count</p>
-      <p class='score'>{{ game_status['peg_count']}}</p>
+      <p id='peg-count' class='score'>{{ game_status['peg_count']}}</p>
     </td>
   </tr>
   <tr>
     <td>
       {% if game_status['dealer'] %}
-      <img src="{{ url_for('static', filename='assets/dealer_button.png') }}">
+      <img id="dealer-p2" src="{{ url_for('static', filename='assets/dealer_button.png') }}">
       {% else %}
       {% endif %}
     </td>
@@ -80,7 +80,7 @@
 <!-- {{ form.current_status }} -->
 <p>{{ cue['cue'] }}</p>
 
-<button type="submit" form="card_acts">submit!</button>
+<button id="submit-button" type="submit" form="card_acts">submit!</button>
 <h5><a href='/reset'>Restart Game</a></h5>
 <hr>
 {{ game_status }}

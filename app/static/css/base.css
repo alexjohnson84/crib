@@ -1,6 +1,4 @@
-.highlight {
-    border: 5px solid yellow;
-}
+
 table.fixed {
   table-layout:fixed;
 }
@@ -33,4 +31,7 @@ p {
 img.card {
     border: 1px solid black;
     margin: 2px 2px 2px 2px;
+}
+img.card.highlight {
+    border: 5px solid yellow;
 }

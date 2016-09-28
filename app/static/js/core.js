@@ -3,7 +3,7 @@ var classHighlight = 'highlight';
 var discard = $('.discard').click(function(e) {
   e.preventDefault();
   currentClass = $(this).get(0).className;
-  if (currentClass == "discard highlight"){
+  if (currentClass == "discard card highlight"){
     $(this).removeClass(classHighlight);
   } else {
     $(this).addClass(classHighlight);
@@ -11,7 +11,7 @@ var discard = $('.discard').click(function(e) {
 });
 
 function get_selection(){
-  var discard_obj = document.getElementsByClassName("discard highlight");
+  var discard_obj = document.getElementsByClassName("discard card highlight");
   console.log(discard_obj);
   var selected_d = []
   for (i = 0; i < discard_obj.length; i++) {

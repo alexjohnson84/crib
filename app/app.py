@@ -1,18 +1,21 @@
+import numpy as np
 from flask import Flask, session, render_template, url_for, request, redirect
 from gameplay.cribplay import CribGame, find_legal_moves
+from gameplay.cribbage_scoring import CribPegScore
 from copy import deepcopy
 from forms import ResponseForm
 from itertools import combinations
 from sklearn.externals import joblib
 import random
 import datetime
+from pprint import pprint
 
 instructions = {'Deal': {'cue': 'Discard 2 Cards',
                         'selection': 2},
                 'Discard': {'cue': 'Turn Over Card',
                             'selection': 0},
                 'Turn': {'cue': 'Submit to Start Pegging',
-                        'selection': 0},
+                        'selection': 1},
                 'Pegging': {'cue': 'Continue Pegging',
                             'selection': 1},
                 'Pegging Complete': {'cue': 'Click to Score',
@@ -25,7 +28,7 @@ app = Flask(__name__, static_url_path='/app/static')
 app.config.from_object('config')
 
 hand_model = joblib.load('models/hand_model/model.pkl')
-peg_model = joblib.load('models/peg_model.pkl')
+peg_model = joblib.load('models/peg_model/model.pkl')
 
 with open('app/static/mapping/card_dir.txt') as f:
     img_map = eval(f.read())
@@ -37,17 +40,17 @@ def lookup_cards(lst):
     return card_paths
 
 def find_best_combination(hand, is_dealer):
-    combos = combinations(hand, 4)
-    # if session['legal_moves'] != 'null':
-    #     session['legal_moves'] = str(session['legal_moves'])[1:-1]
-    return [card for card in hand if card not in max_combo]
+    combos = [[str(list(combo)), is_dealer] for combo in combinations(hand, 4)]
+    preds = hand_model.predict(combos)
+    best_pred_hand = eval(combos[np.argmax(preds)][0])
+    discards = [card for card in hand if card not in best_pred_hand]
+    return discards
 
 def find_best_peg(legal_moves, status):
-    feats = extract_peg_features
     max_pred_points = 0
     best_move = legal_moves[0]
     for move in legal_moves:
-        feats = extract_peg_features(move)
+        feats = extract_peg_features(status, move)
         pred_points = peg_model.predict([feats])
         if pred_points > max_pred_points:
             max_pred_points = pred_points
@@ -56,25 +59,42 @@ def find_best_peg(legal_moves, status):
 
 
 
-def extract_peg_features(status):
-    player = status['Pegger']
-    hand = status['hands'][player]
-    hist = status['peg_hist']
+def extract_peg_features(status, move):
+    # import pdb; pdb.set_trace()
+    player = status['pegger']
+    hand = deepcopy(status['hands'][player]).remove(move)
+    hist = status['peg_hist'] + [move]
     len_opponent = len(status['hands'][abs(player-1)])
-    count = status['peg_count']
-    return [hand, hist, len_opponent, count]
+    cps = CribPegScore(hist)
+    count = cps.count
+    return [hand, len(hist), hist, len_opponent, count]
 
 
 def add_to_history(save=False):
     if 'history' in session:
+        if 'discard_selection' in session:
+            discard_selection = session['discard_selection']
+        else:
+            discard_selection = []
         session['history'].append((session['true_status'],
                                     datetime.datetime.now(),
-                                    session['discard_selection']))
+                                    discard_selection))
     else:
         session['history'] = []
     if save == True:
         with open('data/user_logs.txt', 'a') as ul:
-            ul.write(session['history'])
+            ul.write(str(session['history']))
+
+def get_opponent_response(status):
+        opp_legal_moves = find_legal_moves(status['peg_count'],
+                                            status['hands'][1]
+                                            )
+        if len(opp_legal_moves) == 0:
+            opponent_response = ['GO']
+        else:
+            opponent_response = find_best_peg(opp_legal_moves, status)
+        return opponent_response
+
 
 cg = CribGame()
 
@@ -88,6 +108,7 @@ def index():
     obscure_hand = True
     save = False
     # check for existence
+    # import pdb; pdb.set_trace()
     if 'true_status' not in session:
         session['true_status'] = cg.update()
     elif session['true_status']['phase'] == 'Deal':
@@ -98,28 +119,41 @@ def index():
             session['true_status'] = cg.update(session['true_status'], [user_response, opponent_response])
     elif session['true_status']['phase'] == 'Discard':
         session['true_status'] = cg.update(session['true_status'])
+        if session['true_status']['dealer'] == 0:
+            instructions['Turn']['selection'] = 0
+        else:
+            instructions['Turn']['selection'] = 1
 
     elif session['true_status']['phase'] in ['Pegging', 'Turn']:
         if session['true_status']['pegger'] == 0:
             user_response = session['discard_selection']
             session['true_status'] = cg.update(session['true_status'], user_response)
 
-        opp_legal_moves = find_legal_moves(session['true_status']['peg_count'],
-                                            session['true_status']['hands'][1]
-                                            )
-        if len(opp_legal_moves) == 0:
-            opponent_response = ['GO']
-        else:
-            opponent_response = find_best_peg(opp_legal_moves, session['true_status'])
+        opponent_response = get_opponent_response(session['true_status'])
         session['true_status'] = cg.update(session['true_status'], opponent_response)
         #user go
         session['legal_moves'] = find_legal_moves(session['true_status']['peg_count'],
                                         session['true_status']['hands'][0]
                                         )
         # run go automatically
-        if session['legal_moves'] == []:
+        #this needs to be a while loop
+        while session['legal_moves'] == []:
             session['true_status'] = cg.update(session['true_status'], ['GO'])
+            session['legal_moves'] = find_legal_moves(session['true_status']['peg_count'],
+                                                        session['true_status']['hands'][0]
+                                                        )
+            opponent_response = get_opponent_response(session['true_status'])
+            session['true_status'] = cg.update(session['true_status'], opponent_response)
+            if sum([len(hand) for hand in session['true_status']['hands']]) <= 1:
+                break
+        if session['true_status']['phase'] == 'Pegging Complete':
+            session['legal_moves'] = 'null'
+
+        print "legal moves are ", session['legal_moves']
+
     elif session['true_status']['phase'] == 'Pegging Complete':
+        session['legal_moves'] = 'null'
+        print "legal moves PC", session['legal_moves']
         session['true_status'] = cg.update(session['true_status'])
         obscure_hand = False
     elif session['true_status']['phase'] == 'Round Complete':
@@ -145,19 +179,20 @@ def index():
     session['game_status'] = game_status
     form = ResponseForm()
     add_to_history(save)
-    return redirect(url_for('index'))
+    return redirect(url_for('crib'))
 
 @app.route('/')
-@app.route('/game', methods=['GET'])
+@app.route('/crib', methods=['GET'])
 def crib():
     form = ResponseForm()
     discard_rounds = ['Deal', 'Turn', 'Pegging']
-    import pdb; pdb.set_trace()
     if 'game_status' in session:
         if session['game_status']['phase'] in discard_rounds:
             c_class = 'discard'
         else:
             c_class = ''
+        with open('app/session_log.txt', 'w+') as f:
+            f.write(str(session))
         return render_template('index.html',  game_status=session['game_status'],
                                 true_status=session['true_status'],
                                 form=form,
