@@ -39,13 +39,17 @@ def find_best_peg(legal_moves, status):
     return best_move
 
 def extract_peg_features(status, move):
-    player = status['pegger']
-    hand = deepcopy(status['hands'][player]).remove(move)
-    hist = status['peg_hist'] + [move]
-    len_opponent = len(status['hands'][abs(player-1)])
-    cps = CribPegScore(hist)
-    count = cps.count
-    return [hand, len(hist), hist, len_opponent, count]
+    try:
+        player = status['pegger']
+        hand = deepcopy(status['hands'][player]).remove(move)
+        hist = status['peg_hist'] + [move]
+        len_opponent = len(status['hands'][abs(player-1)])
+        cps = CribPegScore(hist)
+        count = cps.count
+        return [hand, len(hist), hist, len_opponent, count]
+    except:
+        print "CRITICAL ERROR", status, move
+        1/0
 
 class CribGame(object):
     """

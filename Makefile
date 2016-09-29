@@ -43,7 +43,9 @@ play:
 	python app/app.py
 
 build_config:
-	echo -n "SECRET_KEY = '" > config.py
+	rm config.py
+	cp config_base.py config.py
+	echo -n "SECRET_KEY = '" >> config.py
 	hexdump -n 16 -v -e '/1 "%02X"' /dev/urandom >> config.py
 	echo "'" >> config.py
 
@@ -55,6 +57,7 @@ install:
 
 full_build:
 	make install
+	make create_database
 	make build
 
 generate_graphs:

@@ -35,19 +35,22 @@ function validate_input_length(n){
 
 function validate_move(legal_moves){
   console.log(legal_moves);
-
-  if (legal_moves == null) {
-    return true;
-  } else {
-    var move = get_selection()[0]
-    if (legal_moves.indexOf(move) >= 0){
+  var phase = document.getElementById('game-phase').innerHTML.substring(7)
+  if (['Turn', 'Pegging'].indexOf(phase) >= 0){
+    if (legal_moves == null) {
       return true;
     } else {
-      alert('Illegal Move')
-      return false;
+      var move = get_selection()[0]
+      if (legal_moves.indexOf(move) >= 0){
+        return true;
+      } else {
+        alert('Illegal Move')
+        return false;
+      }
     }
   }
 }
+
 
 function validate_form(n, legal_moves){
   var vil = validate_input_length(n);

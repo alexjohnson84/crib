@@ -121,4 +121,4 @@ if __name__ == '__main__':
         arg = bool(sys.argv[1])
     else:
         arg = False
-    main('data/peg_base_table.txt', 'models/peg_model/model.pkl', cv=arg)
+    main('data/logs/random/peg_base_table.txt', 'models/peg_model/model.pkl', cv=arg)

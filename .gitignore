@@ -5,3 +5,5 @@ data/*
 models/*_model/*
 *.ipynb
 config.py
+app.db
+*.log

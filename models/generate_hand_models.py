@@ -116,4 +116,4 @@ if __name__ == '__main__':
         arg = bool(sys.argv[1])
     else:
         arg = False
-    main('data/hand_base_table.txt', 'models/hand_model/model.pkl', cv=arg)
+    main('data/logs/random/hand_base_table.txt', 'models/hand_model/model.pkl', cv=arg)

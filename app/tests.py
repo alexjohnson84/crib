@@ -10,6 +10,7 @@ class NewVisitorTest(unittest.TestCase):
         self.browser = webdriver.Firefox()
         self.browser.get('http://127.0.0.1:5000/reset')
     def tearDown(self):
+        time.sleep(10)
         self.browser.quit()
 
     def selectxcards(self, x):

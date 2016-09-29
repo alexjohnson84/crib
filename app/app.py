@@ -8,6 +8,10 @@ from forms import ResponseForm
 import random
 import datetime
 from pprint import pprint
+# from app.mod import UserLogs
+import logging
+import uuid
+logging.basicConfig(filename='app/example.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
 instructions = {'Deal': {'cue': 'Discard 2 Cards',
                         'selection': 2},
@@ -27,8 +31,21 @@ instructions = {'Deal': {'cue': 'Discard 2 Cards',
 
 app = Flask(__name__, static_url_path='/app/static')
 app.config.from_object('config')
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy(app)
 
-
+class Users(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    u_id = db.Column(db.String(50))
+    games_won = db.Column(db.Integer, default=0)
+    games_lost = db.Column(db.Integer, default=0)
+    def __init__(self, u_id):
+        self.u_id = u_id
+    def add_game(self, iswin):
+        if iswin == True:
+            self.games_won += 1
+        else:
+            self.games_lost += 1
 
 with open('app/static/mapping/card_dir.txt') as f:
     img_map = eval(f.read())
@@ -52,8 +69,9 @@ def add_to_history(save=False):
     else:
         session['history'] = []
     if save == True:
-        with open('data/user_logs.txt', 'a') as ul:
-            ul.write(str(session['history']))
+        ul = UserLogs(str(session['history']))
+        db.session.add(ul)
+        db.session.commit()
 
 def get_opponent_response(status):
         opp_legal_moves = find_legal_moves(status['peg_count'],
@@ -71,15 +89,22 @@ cg = CribGame()
 
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+    if 'user_id' not in session:
+        user_id = str(uuid.uuid4())
+        session['user_id'] = user_id
+        usr = Users(user_id)
+        db.session.add(usr)
+        db.session.commit()
+    else:
+        user_id = session['user_id']
+
+
     session['legal_moves'] = 'null'
     if request.method == 'POST':
         session['discard_selection'] = request.values['discard_selection']
         return redirect(url_for('index'))
     obscure_hand = True
     save = False
-    if 'true_status' in session:
-        print 'phase', session['true_status']['phase']
-    # check for existence
     if 'true_status' not in session:
         session['true_status'] = cg.update()
     elif session['true_status']['phase'] == 'Deal':
@@ -97,7 +122,6 @@ def index():
     elif session['true_status']['phase'] in ['Pegging', 'Turn']:
         if session['true_status']['pegger'] == 0:
             user_response = session['discard_selection']
-            print session['discard_selection']
             session['true_status'] = cg.update(session['true_status'], user_response)
         if session['true_status']['phase'] != 'Pegging Complete':
             opponent_response = get_opponent_response(session['true_status'])
@@ -116,26 +140,28 @@ def index():
             session['legal_moves'] = find_legal_moves(session['true_status']['peg_count'],
                                                         session['true_status']['hands'][0]
                                                         )
-            print session['true_status']
-            print 'legal_moves', session['legal_moves']
 
-            # if sum([len(hand) for hand in session['true_status']['hands']]) <= 1:
-            #     break
         if session['true_status']['phase'] == 'Pegging Complete':
             session['legal_moves'] = 'null'
 
 
     elif session['true_status']['phase'] == 'Pegging Complete':
         session['legal_moves'] = 'null'
-        print "legal moves PC", session['legal_moves']
         session['true_status'] = cg.update(session['true_status'])
         obscure_hand = False
     elif session['true_status']['phase'] == 'Round Complete':
         session['legal_moves'] = 'null'
-        print "legal moves are ", session['legal_moves']
         session['true_status'] = cg.update(session['true_status'])
         obscure_hand = False
         save = True
+    elif session['true_status']['phase'] == 'Game Over':
+        print "game over logged into db"
+        iswin = max(session['true_status']['scores']) == session['true_status']['scores'][0]
+        usr = Users.query.filter_by(u_id=user_id).first()
+        usr.add_game(iswin)
+        db.session.add(usr)
+        db.session.commit()
+        redirect(url_for('reset'))
 
 
     game_status = deepcopy(session['true_status'])
@@ -154,7 +180,9 @@ def index():
     game_status['peg_phist'] = {key:lookup_cards(val) for key,val in game_status['peg_phist'].iteritems()}
     session['game_status'] = game_status
     form = ResponseForm()
-    # add_to_history(save)
+
+    logging.info({'u_id':user_id, 'log':session['true_status']})
+
     return redirect(url_for('crib'))
 
 @app.route('/')
@@ -167,8 +195,6 @@ def crib():
             c_class = 'discard'
         else:
             c_class = ''
-        # with open('app/session_log.txt', 'w+') as f:
-        #     f.write(str(session))
         return render_template('index.html',  game_status=session['game_status'],
                                 true_status=session['true_status'],
                                 form=form,
@@ -180,8 +206,14 @@ def crib():
 
 @app.route('/reset', methods=['GET'])
 def reset():
-    session.clear()
+    print 'session keys', session.keys()
+    if 'user_id' in session:
+        user_id = deepcopy(session['user_id'])
+        session.clear()
+        session['user_id'] = user_id
+
+
     return redirect(url_for('index'))
-    
+
 if __name__ == '__main__':
     app.run(debug=True)
