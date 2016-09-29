@@ -1,6 +1,12 @@
 from deck import CribDeck
 from cribbage_scoring import CribHandScore, CribPegScore
+from itertools import combinations
+from sklearn.externals import joblib
+import numpy as np
+from copy import deepcopy
 
+hand_model = joblib.load('models/hand_model/model.pkl')
+peg_model = joblib.load('models/peg_model/model.pkl')
 
 def find_legal_moves(count, hand):
     if len(hand) == 0:
@@ -14,6 +20,32 @@ def find_legal_moves(count, hand):
                    if val <= remaining_pts]
     return legal_moves
 
+def find_best_hand_combination(hand, is_dealer):
+    combos = [[str(list(combo)), is_dealer] for combo in combinations(hand, 4)]
+    preds = hand_model.predict(combos)
+    best_pred_hand = eval(combos[np.argmax(preds)][0])
+    discards = [card for card in hand if card not in best_pred_hand]
+    return discards
+
+def find_best_peg(legal_moves, status):
+    max_pred_points = 0
+    best_move = legal_moves[0]
+    for move in legal_moves:
+        feats = extract_peg_features(status, move)
+        pred_points = peg_model.predict([feats])
+        if pred_points > max_pred_points:
+            max_pred_points = pred_points
+            best_move = move
+    return best_move
+
+def extract_peg_features(status, move):
+    player = status['pegger']
+    hand = deepcopy(status['hands'][player]).remove(move)
+    hist = status['peg_hist'] + [move]
+    len_opponent = len(status['hands'][abs(player-1)])
+    cps = CribPegScore(hist)
+    count = cps.count
+    return [hand, len(hist), hist, len_opponent, count]
 
 class CribGame(object):
     """

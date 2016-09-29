@@ -6,17 +6,24 @@ import math
 import random
 import json
 import re
-from gameplay.cribplay import CribGame, find_legal_moves
+from gameplay.cribplay import CribGame, find_legal_moves, find_best_hand_combination, find_best_peg
+import sys
 
-
-def run_discard_model(hands):
+def run_discard_model(status, rand):
+    hands = status['hands']
+    dealer = status['dealer']
     discards = []
-    for hand in hands:
-        discards.append(random.sample(hand, 2))
+
+    for i, hand in enumerate(hands):
+        isdeal = i == dealer
+        if rand == True:
+            discards.append(random.sample(hand, 2))
+        else:
+            discards.append(find_best_hand_combination(hand, isdeal))
     return discards
 
 
-def run_peg_model(status):
+def run_peg_model(status, rand):
     """
 
     """
@@ -27,9 +34,12 @@ def run_peg_model(status):
     if len(legal_moves) == 0:
         return ['GO']
     else:
-        return random.choice(hand)
+        if rand == True:
+            return random.choice(hand)
+        else:
+            return find_best_peg(legal_moves, status)
 
-def run_dummy_game(n):
+def run_dummy_game(rand=True):
     cg = CribGame()
     rnd = 0
     peg_rnd = 0
@@ -52,35 +62,19 @@ def run_dummy_game(n):
 
         if status['phase'] == 'Deal':
             hands = status['hands']
-            response = run_discard_model(hands)
+            response = run_discard_model(status, rand)
             status = cg.update(status, response)
         elif status['phase'] == 'Turn' or status['phase'] == 'Pegging':
-            response = run_peg_model(status)
+            response = run_peg_model(status, rand)
             status = cg.update(status, response)
         else:
             status = cg.update(status)
     game_log[rnd][status['phase']] = deepcopy(status)
     return game_log
 
-
-def run_multiple_games(n):
-    game_logs = {}
-    file_count = 0
-    for i in xrange(n):
-        game_logs[str(i)] = run_dummy_game(i)
-        if i % 1000 == 0:
-            print "processed %s of %i iterations" % (i, n)
-        if i % 10000 == 0:
-            print "writing to file"
-        with open('data/game_logs_%s.txt' % (file_count), 'wt') as gl:
-            json.dump(game_logs, gl, indent=4)
-            game_logs = {}
-            file_count += 0
-
-
-def run_para_games(n):
+def run_para_games(n, rand=True):
     p = Pool(16)
-    data = p.map(run_dummy_game, range(n))
+    data = p.map(run_dummy_game, [rand] * n)
     return data
 
 
@@ -94,14 +88,20 @@ def get_highest_file(base_dir):
     return minimum_file
 
 
-def run_multi_paras(batch_size=2000):
-    batch_num = get_highest_file('data/logs')
+def run_multi_paras(batch_size=2000, rand=True):
+    if rand == True:
+        base_dir = 'data/logs/random/'
+    else:
+        base_dir = 'data/logs/model/'
+    batch_num = get_highest_file(base_dir)
     batch_data = run_para_games(batch_size)
-    with open('data/logs/para_game_%s.txt' % (batch_num), 'wt') as pg:
-        # pg.write(str(batch_data))
+    with open(base_dir + 'para_game_%s.txt' % (batch_num), 'wt') as pg:
         json.dump(batch_data, pg)
 
 
 if __name__ == "__main__":
-    run_multi_paras()
-    # run_dummy_game(2)
+    if len(sys.argv) > 1:
+        arg = bool(sys.argv[1])
+    else:
+        arg = False
+    run_multi_paras(rand=arg)

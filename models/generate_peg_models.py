@@ -48,7 +48,7 @@ class GeneratePegModel(object):
                                                 ]))
                                             ])),
                             ('mod', self.models[mod_name])
-                                ])
+                            ])
         self.dtr.fit(X, y)
 
     def train_model(self, length, mod_name):

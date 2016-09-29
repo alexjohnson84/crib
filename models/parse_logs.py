@@ -1,8 +1,8 @@
 import json
 import csv
 import os.path
+import sys
 from models.generate_data import get_highest_file
-import ast
 
 
 class BuildBaseTables(object):
@@ -90,9 +90,16 @@ def main(base_dir):
     hf = get_highest_file(base_dir)
     for i in range(hf):
         bt = BuildBaseTables('%s/para_game_%s.txt' % (base_dir, i))
-        bt.assemble_hand_base_table('%s/../hand_base_table.txt' % (base_dir))
-        bt.assemble_peg_base_table('%s/../peg_base_table.txt' % (base_dir))
+        bt.assemble_hand_base_table('%s/hand_base_table.txt' % (base_dir))
+        bt.assemble_peg_base_table('%s/peg_base_table.txt' % (base_dir))
 
 
 if __name__ == "__main__":
-    main('data/logs')
+    if len(sys.argv) > 1:
+        arg = bool(sys.argv[1])
+    else:
+        arg = False
+    if arg == True:
+        main('data/logs/random')
+    else:
+        main('data/logs/model')
