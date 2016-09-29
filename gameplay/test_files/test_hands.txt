@@ -81,11 +81,11 @@
     "thirty_one": {
       "ex1": {"hist": "['KS','KH','KH','AS']",
               "score": 2,
-              "count": 31
+              "count": 0
               },
       "ex2": {"hist": "['KS','2H','KH','9S']",
               "score": 2,
-              "count": 31
+              "count": 0
               }
     },
     "GO": {

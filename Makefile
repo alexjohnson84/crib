@@ -1,6 +1,8 @@
 
 test:
 	python gameplay/tests.py
+testapp:
+	python app/tests.py
 
 generate:
 	seq 1 | xargs -Iz python models/generate_data.py True

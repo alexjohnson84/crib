@@ -106,7 +106,10 @@ class TestGamePlay(unittest.TestCase):
             else:
                 response = play['test_response']
                 new_status = cg.update(old_status, response)
-                self.assertEqual(new_status['scores'], play['scores'])
+                self.assertEqual(new_status['scores'], play['scores'],
+                                str(new_status['scores']) + ' != ' +
+                                str(play['scores']) + "example: " + str(play)
+                                )
                 self.assertEqual(new_status['peg_hist'], play['peg_hist'])
                 self.assertEqual(new_status['pegger'], play['pegger'], play)
                 for i in range(len(new_status['hands'])):

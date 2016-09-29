@@ -267,6 +267,8 @@ class CribGame(object):
                                     status['deck'],
                                     status['faceup'],
                                     kitty=status['kitty'],
+                                    peg_hist=status['peg_hist'],
+                                    peg_phist=status['peg_phist'],
                                     dealer=status['dealer'],
                                     pegger=pegger
                                     )
@@ -292,9 +294,3 @@ class CribGame(object):
                                     peg_hist=[],
                                     dealer=status['dealer'],
                                     )
-if __name__ == '__main__':
-    old_status = {'peg_phist': {'1': [], '0': []}, 'peg_hist': [], 'scores': [0, 0], 'deck': ['JH', '2D', '10H', '5D', '9D', '8C', '5H', '5S', '6C', 'AD', 'JC', '5C', 'KC', '8H', '2S', 'KS', '10D', '8S', '2C', '3H', 'QS', '3S', '9C', '4D', 'AH', '4C', '3C', '3D', 'KD', '6H', 'QC', '2H', '7S', 'QD', '7H', 'JS', '7C', '8D', 'KH'], 'phase': 'Turn', 'pegger': 0, 'faceup': '7D', 'hands': [['9H', '4H', '6S', 'JD'], ['10C', '6D', '9S', 'AC']], 'kitty': [], 'dealer': 1}
-
-    cg = CribGame()
-    new_status = cg.update(old_status, '9H')
-    print new_status

@@ -1,5 +1,6 @@
 import itertools
 from collections import Counter
+from copy import deepcopy
 from functools import reduce
 
 
@@ -114,12 +115,12 @@ class CribPegScore(object):
     def __init__(self, history):
         with open('gameplay/reference_files/value_map.txt', 'r') as vm:
             self.value_map = eval(vm.read())
-        self.history = history
+        self.history = deepcopy(history)
 
-        self.r_hist = history[::-1]
-        if 'GO' in history and history.count('GO') % 2 == 0:
+        self.r_hist = self.history[::-1]
+        if 'GO' in self.history and self.history.count('GO') % 2 == 0:
             self.r_hist = self.r_hist[:self.r_hist.index('GO')]
-        if history.count('GO') >= 3 and history.count('GO') % 2 == 1:
+        if self.history.count('GO') >= 3 and self.history.count('GO') % 2 == 1:
             go_idxs = [i for i, move in enumerate(self.r_hist) if move == 'GO']
             self.r_hist = self.r_hist[:go_idxs[1]]
         # check if 31 has been met
@@ -135,6 +136,7 @@ class CribPegScore(object):
             self.score += 2
         if self.count == 31:
             self.r_hist = []
+            self.count = 0
         # check for 'GO'
         if self.history[-1] == 'GO':
             self.score += 1
@@ -206,5 +208,5 @@ class CribPegScore(object):
         """
         card_points = [self.value_map['numbers'][val[:-1]]
                        for val in self.r_hist if val != 'GO']
-        total = sum(card_points) % 31
+        total = sum(card_points)
         return total
