@@ -8,9 +8,10 @@ import random
 class NewVisitorTest(unittest.TestCase):
     def setUp(self):
         self.browser = webdriver.Firefox()
+        self.browser.get_cookies()
         self.browser.get('http://127.0.0.1:5000/reset')
     def tearDown(self):
-        time.sleep(10)
+        # time.sleep(10)
         self.browser.quit()
 
     def selectxcards(self, x):
@@ -47,7 +48,7 @@ class NewVisitorTest(unittest.TestCase):
         phase = title[0].text[title[0].text.find(' ') + 1:]
         return phase
 
-    def test_gameplay(self):
+    def single_game(self):
         phase = self.find_phase()
         while phase != 'Game Over':
             self.check_for_title_on_page()
@@ -64,6 +65,18 @@ class NewVisitorTest(unittest.TestCase):
                 self.submitpage()
             else:
                 self.submitpage()
+
+    def test_single_game(self):
+        self.single_game()
+
+    @unittest.skip('skipping multiple games')    
+    def test_multiple_games(self, n=5):
+        for i in range(n):
+            print "i is ", i
+            self.single_game()
+
+
+
 
 if __name__ == '__main__':
     unittest.main()

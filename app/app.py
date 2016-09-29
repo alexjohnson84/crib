@@ -161,7 +161,7 @@ def index():
         usr.add_game(iswin)
         db.session.add(usr)
         db.session.commit()
-        redirect(url_for('reset'))
+        return redirect(url_for('reset'))
 
 
     game_status = deepcopy(session['true_status'])

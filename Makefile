@@ -5,7 +5,7 @@ testapp:
 	python app/tests.py
 
 generate:
-	seq 1 | xargs -Iz python models/generate_data.py True
+	seq 10 | xargs -Iz python models/generate_data.py True
 	python models/parse_logs.py True
 
 generate_modeled:
@@ -30,8 +30,6 @@ model_cv:
 	rm -f graphs/*
 	python models/generate_peg_models.py True
 	python models/generate_hand_models.py True
-
-
 
 build:
 	make clean
