@@ -2,7 +2,6 @@
 *.ipynb_checkpoints
 *cc_virt
 data/*
-models/*_model/*
 *.ipynb
 config.py
 app.db
