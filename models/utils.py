@@ -2,7 +2,14 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
 import os
 
+
 def append_dict_to_file(path, d):
+    """
+    Function to append a dictionary to a file, used in hand and peg model
+    generation
+    INPUT: Path, dictionary
+    OUTPUT: None
+    """
     if os.path.isfile(path):
         with open(path, 'r') as f:
             data = eval(f.read())
@@ -11,6 +18,7 @@ def append_dict_to_file(path, d):
         data = d
     with open(path, 'w') as f:
         f.write(str(data))
+
 
 class ItemSelector(BaseEstimator, TransformerMixin):
     """
@@ -43,6 +51,7 @@ class ItemSelector(BaseEstimator, TransformerMixin):
     key : hashable, required
         The key corresponding to the desired value in a mappable.
     """
+
     def __init__(self, key):
         self.key = key
 
@@ -51,6 +60,7 @@ class ItemSelector(BaseEstimator, TransformerMixin):
 
     def transform(self, data_dict):
         return data_dict[self.key]
+
 
 class PegFeatureExtractor(BaseEstimator, TransformerMixin):
     """
@@ -66,6 +76,7 @@ class PegFeatureExtractor(BaseEstimator, TransformerMixin):
     """
     headers = ['hand', 'cards_played', 'peg_history', 'len_opponent', 'count']
     continous = ['cards_played', 'len_opponent', 'count']
+
     def fit(self, x, y=None):
         return self
 
@@ -75,27 +86,35 @@ class PegFeatureExtractor(BaseEstimator, TransformerMixin):
             if head in cont:
                 pass
             else:
-                if type(item) is str:
+                if isinstance(item, str):
                     item = eval(item)
-                if type(item) is list:
+                if isinstance(item, list):
                     if head == 'hand':
                         for card in item:
-                            output_dict[head+"_"+card] = 1
+                            output_dict[head + "_" + card] = 1
                     elif head == 'peg_history':
                         for i, card in enumerate(item):
-                            output_dict[head+"_"+card] = i + 1
+                            output_dict[head + "_" + card] = i + 1
                 else:
                     output_dict[head] = item
         return output_dict
 
     def transform(self, peg_data):
         features = {}
-        features['X_dict'] = [self._line_to_dict(self.headers, line, cont=self.continous) for line in peg_data]
-        features['X_cnt'] = np.array([float(line[4]) for line in peg_data]).reshape(-1, 1)
-        features['X_lo'] = np.array([float(line[3]) for line in peg_data]).reshape(-1, 1)
-        features['X_cp'] = np.array([float(line[1]) for line in peg_data]).reshape(-1, 1)
+        features['X_dict'] = [
+            self._line_to_dict(
+                self.headers,
+                line,
+                cont=self.continous) for line in peg_data]
+        features['X_cnt'] = np.array([float(line[4])
+                                      for line in peg_data]).reshape(-1, 1)
+        features['X_lo'] = np.array([float(line[3])
+                                     for line in peg_data]).reshape(-1, 1)
+        features['X_cp'] = np.array([float(line[1])
+                                     for line in peg_data]).reshape(-1, 1)
 
         return features
+
 
 class HandFeatureExtractor(BaseEstimator, TransformerMixin):
     """
@@ -110,11 +129,14 @@ class HandFeatureExtractor(BaseEstimator, TransformerMixin):
 
     """
     headers = ['hand', 'dealer']
+
     def fit(self, x, y=None):
         return self
 
     def transform(self, hand_data):
         features = {}
-        features['X_hand'] = [{card:1 for card in eval(line[0])} for line in hand_data]
-        features['X_dealer'] = np.array([line[1] for line in hand_data]).reshape(-1, 1)
+        features['X_hand'] = [
+            {card: 1 for card in eval(line[0])} for line in hand_data]
+        features['X_dealer'] = np.array(
+            [line[1] for line in hand_data]).reshape(-1, 1)
         return features

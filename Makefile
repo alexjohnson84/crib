@@ -5,7 +5,9 @@ testapp:
 	python app/tests.py
 
 generate:
-	seq 10 | xargs -Iz python models/generate_data.py True
+	# Generate fake data and store them as log files.  On every move, each
+	# choice is a random choice of legal moves
+	seq 100 | xargs -Iz python models/generate_data.py True
 	python models/parse_logs.py True
 
 generate_modeled:
@@ -41,6 +43,8 @@ play:
 	python app/app.py
 
 build_config:
+	# Builds new configuration file for flask.  Copies database information from
+	# config_base and creates a random hexidecimal code for the secretkey
 	rm config.py
 	cp config_base.py config.py
 	echo -n "SECRET_KEY = '" >> config.py

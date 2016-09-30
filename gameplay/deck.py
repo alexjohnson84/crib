@@ -6,8 +6,10 @@ values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
 
 
 class PlainDeck(object):
-    """Initialize Base Deck Class with Basic Create, Shuffle, Deal, and Cut
-    functions.  Inherited by CribDeck"""
+    """
+    Initialize Base Deck Class with Basic Create, Shuffle, Deal, and Cut
+    functions.  Inherited by CribDeck
+    """
 
     def __init__(self, deck=None):
         """

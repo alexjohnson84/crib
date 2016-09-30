@@ -10,6 +10,8 @@ class VisitorTest(unittest.TestCase):
     Use Selenium based testing to run through an entire game with random choices
     of legal moves. Primarily tests for errors with the app as users progress
     through the app.
+
+    Note:  Currently app needs to be running in separate terminal to run tests
     """
     def setUp(self):
         """
@@ -117,7 +119,7 @@ class VisitorTest(unittest.TestCase):
         """
         self.single_game()
 
-    # @unittest.skip('skipping multiple games')
+    @unittest.skip('skipping multiple games')
     def test_multiple_games(self, n=5):
         """
         Run multiple games.  Needs testing added to make sure the user log data

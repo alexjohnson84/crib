@@ -6,20 +6,20 @@ from functools import reduce
 
 class CribHandScore(object):
     """
-    Score cribbage hand for both cases of pegging and handscoring
+    Score cribbage hand
     """
 
-    def __init__(self, score_type='hand'):
+    def __init__(self):
         """
         Initialize class
         """
-        self.score_type = score_type
+        pass
 
     def score(self, hand, turn=None):
         """
-        Score then hand based upon the scoring type
-
-        Create a counter of values and of suits
+        Score then hand, and if turn is present use it to build a full hand.
+        INPUT: hand(list), turn(string, optional)
+        OUTPUT: score (int)
         """
         self.hand = hand
         self.turn = turn
@@ -43,11 +43,18 @@ class CribHandScore(object):
         return score
 
     def _value_and_suit_counters(self, hand):
+        """
+        Setup counter objects of values and suits
+        """
         value_counter = Counter([card[:-1] for card in hand])
         suit_counter = Counter([card[-1] for card in hand])
         return value_counter, suit_counter
 
     def _score_fifteens(self, full_hand):
+        """
+        Check for all combos of cards from the full hand and add return number
+        of 15's * 2 points
+        """
         current_score = 0
         combos = []
         for i in range(2, len(full_hand) + 1):
@@ -61,12 +68,20 @@ class CribHandScore(object):
         return current_score
 
     def _score_pairs(self, value_counter):
+        """
+        Find duplicates of cards, and assign it a score based upon method
+        varibale mapped_pair
+        """
         mapped_pair = {2: 2, 3: 6, 4: 12}
         mapped_values = [mapped_pair[value] for value in value_counter.values()
                          if value >= 2]
         return sum(mapped_values)
 
     def _score_flushes(self, suit_counter):
+        """
+        Cribbage only gives points for 4 or 5 cards of same suit.  Checks
+        for same suit and returns score
+        """
         return sum([value for key, value in suit_counter.iteritems()
                     if value >= 4])
 
@@ -89,6 +104,11 @@ class CribHandScore(object):
             return 0
 
     def _longest_consecutive_sequence(self, lst):
+        """
+        Helper function to find the longest consecutive sequence.
+        INPUT: lst
+        OUTPUT: values of longest straight
+        """
         s_lst = sorted(lst)
         longest_list = [s_lst[0]]
         current_list = [s_lst[0]]
@@ -102,6 +122,9 @@ class CribHandScore(object):
         return longest_list
 
     def _score_nobs(self):
+        """
+        Add extra point if jack is flipped
+        """
         current_score = 0
         if self.turn is not None:
             flipped_suit = self.turn[0][-1]
@@ -111,8 +134,17 @@ class CribHandScore(object):
 
 
 class CribPegScore(object):
+    """
+    Determine both the count and score of a cribbage hand
+    """
 
     def __init__(self, history):
+        """
+        Ingest pegging history and return the score of the last card played, as
+        well as the current count of the history
+        INPUT: Pegging history
+        OUTPUT: Pegging score, pegging count
+        """
         with open('gameplay/reference_files/value_map.txt', 'r') as vm:
             self.value_map = eval(vm.read())
         self.history = deepcopy(history)
@@ -147,6 +179,9 @@ class CribPegScore(object):
             self.score += 1
 
     def _score_peg(self):
+        """
+        Score last cards played and check if pairs or straights have been met
+        """
         score = 0
         if len(self.r_hist) > 0:
             score += self._check_pair_points(self.r_hist)
@@ -154,6 +189,11 @@ class CribPegScore(object):
         return score
 
     def _find_seq_start(self, lst):
+        """
+        Find the start of the history that are incorporated into the count and
+        score, ex: if 31 or both users "GO" we don't count pairs or scores that
+        go before the index of the start
+        """
         card_points = []
         for val in lst:
             if val == 'GO':
@@ -169,6 +209,10 @@ class CribPegScore(object):
         return idx_start
 
     def _check_pair_points(self, lst):
+        """
+        Check points for the pairs, needs to incorporate last card if
+        it is to come up with valid points.
+        """
         mapped_pair = {2: 2, 3: 6, 4: 12}
         last_card = lst[0][:-1]
         max_pair = 0
@@ -204,7 +248,7 @@ class CribPegScore(object):
     def check_count(self):
         """
         Check the current count
-        History is sliced on the last 'GO' and reduced to [] if 31 is met
+        History is sliced on the last 2 'GOs' and reduced to [] if 31 is met
         """
         card_points = [self.value_map['numbers'][val[:-1]]
                        for val in self.r_hist if val != 'GO']

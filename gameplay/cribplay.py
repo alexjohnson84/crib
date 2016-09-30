@@ -5,10 +5,21 @@ from sklearn.externals import joblib
 import numpy as np
 from copy import deepcopy
 
+
+"""
+Load in hand and peg models as global variables
+"""
 hand_model = joblib.load('models/hand_model/model.pkl')
 peg_model = joblib.load('models/peg_model/model.pkl')
 
+
 def find_legal_moves(count, hand):
+    """
+    For pegging actions
+    INPUT: count(int), hand(list)
+    OUTPUT: List of legal moves.  If no legal moves are available return null
+    list
+    """
     if len(hand) == 0:
         return []
     with open('gameplay/reference_files/value_map.txt', 'r') as vm:
@@ -21,13 +32,40 @@ def find_legal_moves(count, hand):
     return legal_moves
 
 def find_best_hand_combination(hand, is_dealer):
+    """
+    Build all 4 card combinations from 6 initial cards (24 total)
+    Run model across all 24 combos, select card combo with the highest predicted score
+    determine which cards out of the best 4 were discarded, return discards
+
+    INPUT: player hand(list), is_dealer(bool)
+    OUTPUT: 2 cards to discard (list)
+    """
     combos = [[str(list(combo)), is_dealer] for combo in combinations(hand, 4)]
     preds = hand_model.predict(combos)
     best_pred_hand = eval(combos[np.argmax(preds)][0])
     discards = [card for card in hand if card not in best_pred_hand]
     return discards
 
+def extract_peg_features(status, move):
+    """
+    Extract peg features and put them in the form to be ingested by model
+    INPUT: status(dict), move(str)
+    OUTPUT: list in the form of : [hand, len(hist), hist, len_opponent, count]
+    """
+    player = status['pegger']
+    hand = deepcopy(status['hands'][player]).remove(move)
+    hist = status['peg_hist'] + [move]
+    len_opponent = len(status['hands'][abs(player - 1)])
+    cps = CribPegScore(hist)
+    count = cps.count
+    return [hand, len(hist), hist, len_opponent, count]
+
 def find_best_peg(legal_moves, status):
+    """
+    Peg model across all legal moves, return the best move
+    INPUT: legal_moves(list), status(dict)
+    OUPUT: best card to play (str)
+    """
     max_pred_points = 0
     best_move = legal_moves[0]
     for move in legal_moves:
@@ -38,31 +76,34 @@ def find_best_peg(legal_moves, status):
             best_move = move
     return best_move
 
-def extract_peg_features(status, move):
-    try:
-        player = status['pegger']
-        hand = deepcopy(status['hands'][player]).remove(move)
-        hist = status['peg_hist'] + [move]
-        len_opponent = len(status['hands'][abs(player-1)])
-        cps = CribPegScore(hist)
-        count = cps.count
-        return [hand, len(hist), hist, len_opponent, count]
-    except:
-        print "CRITICAL ERROR", status, move
-        1/0
 
 class CribGame(object):
     """
     Main Class for Cribbage Gameplay.  Utilizes a status dict to allow
     communication between frontend and class to facilitate independent requests
 
-    Example API for frontend.  Dict stored as a session variable
-    {phase:"pegging",
-    scores: [45, 67],
-    hands: [['5C', '10S', '8H', '6S', '3D', 'KC'],
-             ['KS', 'JD', '6D', '6H', '9C', '7S']],
-    faceup: '4H',
-    deck: [list of remaining cards]}
+    Example API for frontend.  Dict stored as a session variable in the
+    following format
+
+    {
+        u 'peg_count': 0,
+        u 'deck': [u '3H', u 'JD', u 'KD', u '4H', u '2D', u '4C', u 'JS', u 'JH', u '5D', u '2C', u '9S', u 'KS', u '6H', u '8H', u '10D', u '6S', u '10S', u 'AD', u '4D', u '7H', u '5H', u '5S', u '8D', u 'AC', u '8C', u '6C', u '4S', u 'AS', u '5C', u 'AH', u 'QD', u '7D', u '9C', u '2H', u '8S', u '10C', u '3C', u 'QS', u '9H', u '7S'],
+        u 'kitty': [u '3S', u '3D', u '10H', u 'KC'],
+        u 'faceup': None,
+        u 'scores': [116, 96],
+        u 'pegger': None,
+        u 'phase': u 'Discard',
+        u 'peg_hist': [],
+        u 'hands': [
+                [u '6D', u '9D', u 'KH', u 'JC'],
+                [u '7C', u 'QC', u '2S', u 'QH']
+        ],
+        u 'peg_phist': {
+                u '1': [],
+                u '0': []
+        },
+        u 'dealer': 0
+    }
     """
 
     def __init__(self, num_p=2):
@@ -229,7 +270,6 @@ class CribGame(object):
         action
         """
         phase = 'Pegging'
-        # import pdb; pdb.set_trace()
         pegger = status['pegger']
         player_pegs = len(status['peg_phist'][str(pegger)])
         min_pegs = min([len(hand) for player, hand in
@@ -250,7 +290,7 @@ class CribGame(object):
             peg_count = cps.count
             pegger = self.switch_player(pegger)
             if min([len(hand) for player, hand in
-                            status['peg_phist'].iteritems()]) != 4:
+                    status['peg_phist'].iteritems()]) != 4:
                 return self.create_response(phase,
                                             scores,
                                             status['hands'],
@@ -278,6 +318,9 @@ class CribGame(object):
                                     )
 
     def hand_scoring(self, status):
+        """
+        Run hand scoring model and finish out the round
+        """
         phase = 'Round Complete'
         scores = status['scores']
         turn = status['faceup']
