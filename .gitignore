@@ -1,6 +1,5 @@
 *.pyc
 *.ipynb_checkpoints
-*cc_virt
 data/*
 *.ipynb
 config.py
