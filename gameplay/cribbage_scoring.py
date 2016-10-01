@@ -33,12 +33,11 @@ class CribHandScore(object):
             self._value_and_suit_counters(self.full_hand)
 
         score = 0
-        if self.score_type == 'hand':
-            score += self._score_fifteens(self.full_hand)
-            score += self._score_pairs(self.value_counter)
-            score += self._score_flushes(self.suit_counter)
-            score += self._score_runs(self.value_counter)
-            score += self._score_nobs()
+        score += self._score_fifteens(self.full_hand)
+        score += self._score_pairs(self.value_counter)
+        score += self._score_flushes(self.suit_counter)
+        score += self._score_runs(self.value_counter)
+        score += self._score_nobs()
 
         return score
 

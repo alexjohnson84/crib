@@ -34,6 +34,7 @@ model_cv:
 	python models/generate_hand_models.py True
 
 build:
+	mkdir data/
 	make clean
 	make generate
 	make model_cv
