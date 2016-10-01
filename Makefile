@@ -38,6 +38,7 @@ build:
 	make generate
 	make model_cv
 	make model
+	make generate_modeled
 
 play:
 	python app/app.py
@@ -45,7 +46,7 @@ play:
 build_config:
 	# Builds new configuration file for flask.  Copies database information from
 	# config_base and creates a random hexidecimal code for the secretkey
-	rm config.py
+	rm -f config.py
 	cp config_base.py config.py
 	echo -n "SECRET_KEY = '" >> config.py
 	hexdump -n 16 -v -e '/1 "%02X"' /dev/urandom >> config.py
@@ -58,8 +59,7 @@ install:
 	make build_config
 
 full_build:
-	make install
-	make create_database
+	pip install -r requirements.txt
 	make build
 
 generate_graphs:

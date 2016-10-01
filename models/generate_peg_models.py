@@ -34,7 +34,7 @@ class GeneratePegModel(object):
                 self.peg_data.append(list(eval(line)))
         self.transform()
         self.scores = []
-        self.models = {'dtr': DecisionTreeRegressor(),
+        self.models = {#'dtr': DecisionTreeRegressor(),
                        'br': BaggingRegressor(n_jobs=-1),
                        'rfr': RandomForestRegressor(n_jobs=-1),
                        }
