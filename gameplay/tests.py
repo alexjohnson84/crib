@@ -157,7 +157,7 @@ class TestHandScoring(unittest.TestCase):
     """
     with open('gameplay/test_files/test_hands.txt', 'r') as th:
         test_hands = eval(th.read())['handscore']
-    cs = CribHandScore(score_type='hand')
+    cs = CribHandScore()
 
     def test_hand_fifteen(self):
         for key, example in self.test_hands['fifteen'].iteritems():

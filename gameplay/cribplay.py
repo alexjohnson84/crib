@@ -32,7 +32,7 @@ def find_legal_moves(count, hand):
                    if val <= remaining_pts]
     return legal_moves
 
-def find_best_hand_combination(hand, is_dealer):
+def find_best_hand_combination(hand, is_dealer, return_all=False):
     """
     Build all 4 card combinations from 6 initial cards (24 total)
     Run model across all 24 combos, select card combo with the highest predicted score
@@ -43,9 +43,18 @@ def find_best_hand_combination(hand, is_dealer):
     """
     combos = [[str(list(combo)), is_dealer] for combo in combinations(hand, 4)]
     preds = hand_model.predict(combos)
-    best_pred_hand = eval(combos[np.argmax(preds)][0])
-    discards = [card for card in hand if card not in best_pred_hand]
-    return discards
+    if return_all == False:
+        best_pred_hand = eval(combos[np.argmax(preds)][0])
+        discards = [card for card in hand if card not in best_pred_hand]
+        return discards
+    else:
+        discards_and_preds = []
+        for pred_score, combo in zip(preds, combos):
+            score = pred_score
+            discards = [card for card in hand if card not in eval(combo[0])]
+            discards_and_preds.append([discards, score])
+        return discards_and_preds
+
 
 def extract_peg_features(status, move):
     """
@@ -61,7 +70,7 @@ def extract_peg_features(status, move):
     count = cps.count
     return [hand, len(hist), hist, len_opponent, count]
 
-def find_best_peg(legal_moves, status):
+def find_best_peg(legal_moves, status, return_all=False):
     """
     Peg model across all legal moves, return the best move
     INPUT: legal_moves(list), status(dict)
@@ -69,13 +78,22 @@ def find_best_peg(legal_moves, status):
     """
     max_pred_points = 0
     best_move = legal_moves[0]
-    for move in legal_moves:
-        feats = extract_peg_features(status, move)
-        pred_points = peg_model.predict([feats])
-        if pred_points > max_pred_points:
-            max_pred_points = pred_points
-            best_move = move
-    return best_move
+    if return_all == False:
+        for move in legal_moves:
+            feats = extract_peg_features(status, move)
+            pred_points = peg_model.predict([feats])
+            if pred_points > max_pred_points:
+                max_pred_points = pred_points
+                best_move = move
+        return best_move
+    else:
+        all_moves = []
+        for move in legal_moves:
+            feats = extract_peg_features(status, move)
+            all_moves.append([move, float(peg_model.predict([feats]))])
+        return all_moves
+
+
 
 
 class CribGame(object):
