@@ -55,9 +55,9 @@ build_config:
 
 install:
 	virtualenv cc_virt
-	source cc_virt/bin/activate
-	pip install -r requirements.txt
+	cc_virt/bin/pip install -r requirements.txt
 	make build_config
+
 
 full_build:
 	pip install -r requirements.txt
