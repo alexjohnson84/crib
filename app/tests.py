@@ -25,7 +25,8 @@ class VisitorTest(unittest.TestCase):
         """
         Quit webdriver, no temporary database setup yet
         """
-        self.browser.quit()
+        pass
+        # self.browser.quit()
 
     def selectxcards(self, x):
         """
@@ -113,13 +114,13 @@ class VisitorTest(unittest.TestCase):
             else:
                 self.submitpage()
 
+    @unittest.skip('skipping multiple games')
     def test_single_game(self):
         """
         Run a single game, currently tests the title renders on each page
         """
         self.single_game()
 
-    @unittest.skip('skipping multiple games')
     def test_multiple_games(self, n=5):
         """
         Run multiple games.  Needs testing added to make sure the user log data

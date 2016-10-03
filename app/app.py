@@ -206,17 +206,21 @@ def crib():
                                 cue=instructions[session['game_status']['phase']],
                                 card_class=c_class,
                                 legal_moves=session['legal_moves'],
-                                move_scores=session['move_scores'])
+                                move_scores=session['move_scores'],
+                                user_wl = session['user_wl'])
     else:
         return redirect(url_for('index'))
 
 @app.route('/reset', methods=['GET'])
 def reset():
-    print 'session keys', session.keys()
     if 'user_id' in session:
         user_id = deepcopy(session['user_id'])
         session.clear()
         session['user_id'] = user_id
+        active_user = Users.query.filter(Users.u_id == session['user_id']).first()
+        session['user_wl'] = [active_user.games_won, active_user.games_lost]
+    else:
+        session['user_wl'] = [0,0]
 
 
     return redirect(url_for('index'))

@@ -43,3 +43,7 @@ img.card.highlight.best {
 img.card.best {
     border: 5px solid red;
 }
+#see-best {
+    height: 20px;
+    width: 20px;
+}

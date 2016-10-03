@@ -80,14 +80,25 @@
 <!-- {{ form.current_status }} -->
 <p>{{ cue['cue'] }}</p>
 
-<button id="submit-button" type="submit" form="card_acts">submit!</button>
+<table>
+<tbody>
+<tr>
+<td><button id="submit-button" type="submit" form="card_acts">submit!</button></td>
+<td width='415px'></td>
+<td><button type='button' onclick="compare_selection_to_response({{ move_scores }})"><img id='see-best' src="{{ url_for('static', filename='assets/eyecon.png')}}"></button></td>
+</tr>
+</tbody>
+</table>
+
+
+
 <h5><a href='/reset'>Restart Game</a></h5>
 <br>
-<button type='button' onclick="compare_selection_to_response({{ move_scores }})">test vis</button>
-<hr>
+
+<!-- commented out for debugging <hr>
 {{ true_status }}
 <hr>
-{{ move_scores }}
+{{ move_scores }} -->
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/core.js') }}"></script>
 {% endblock %}
