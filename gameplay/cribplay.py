@@ -10,8 +10,9 @@ from copy import deepcopy
 Load in hand and peg models as global variables
 """
 hand_model = joblib.load('models/hand_model/model.pkl')
+hand_model.set_params(mod__n_jobs=1)
 peg_model = joblib.load('models/peg_model/model.pkl')
-
+peg_model.set_params(mod__n_jobs=1)
 
 def find_legal_moves(count, hand):
     """
