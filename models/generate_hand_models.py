@@ -148,7 +148,7 @@ class GenerateHandModel(object):
         for mod_name in self.models.keys():
             self.scores = []
             self.cross_score_model(mod_name)
-        self.build_cv_graph('graphs/hand_cv_scores.png')
+        #self.build_cv_graph('graphs/hand_cv_scores.png')
 
 
 def main(input_path, output_path, cv=False):

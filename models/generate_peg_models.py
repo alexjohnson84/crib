@@ -34,7 +34,7 @@ class GeneratePegModel(object):
                 self.peg_data.append(list(eval(line)))
         self.transform()
         self.scores = []
-        self.models = {#'dtr': DecisionTreeRegressor(),
+        self.models = {'dtr': DecisionTreeRegressor(),
                        'br': BaggingRegressor(n_jobs=-1),
                        'rfr': RandomForestRegressor(n_jobs=-1),
                        }
@@ -98,7 +98,7 @@ class GeneratePegModel(object):
         This section takes the longest, so added time logging to track process
         Saves self.scores to file in case process is halted for reference.
         """
-        lengths = [10, 100, 1000, 10000, 100000, 1000000, 10000000, 20000000]
+        lengths = [10, 100, 1000, 10000, 100000, 1000000, 2000000, 3000000, 4000000] #, 20000000]
         start = time.time()
         for length in lengths:
             self.train_model(length, mod_name)
@@ -157,7 +157,7 @@ class GeneratePegModel(object):
         for mod_name in self.models.keys():
             self.scores = []
             self.cross_score_model(mod_name)
-        self.build_cv_graph('graphs/peg_cv_scores.png')
+        #self.build_cv_graph('graphs/peg_cv_scores.png')
 
 
 def main(input_path, output_path, cv=False):
@@ -169,7 +169,7 @@ def main(input_path, output_path, cv=False):
     if cv:
         ghm.cv_pipeline_models()
     else:
-        ghm.run_full_model('br', 1000)
+        ghm.run_full_model('br', 4000000)
         ghm.save_model(output_path)
 
 if __name__ == '__main__':
