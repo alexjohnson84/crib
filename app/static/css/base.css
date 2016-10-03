@@ -35,3 +35,11 @@ img.card {
 img.card.highlight {
     border: 5px solid yellow;
 }
+
+img.card.highlight.best {
+    border: 5px solid green;
+}
+
+img.card.best {
+    border: 5px solid red;
+}

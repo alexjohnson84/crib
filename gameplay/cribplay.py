@@ -37,9 +37,11 @@ def find_best_hand_combination(hand, is_dealer, return_all=False):
     Build all 4 card combinations from 6 initial cards (24 total)
     Run model across all 24 combos, select card combo with the highest predicted score
     determine which cards out of the best 4 were discarded, return discards
+    If returnall is true, we return all the possible moves with pred points
 
-    INPUT: player hand(list), is_dealer(bool)
-    OUTPUT: 2 cards to discard (list)
+    INPUT: player hand(list), is_dealer(bool), returnall
+    OUTPUT: 2 cards to discard (list) if false,
+            else all possibilities with predicted points
     """
     combos = [[str(list(combo)), is_dealer] for combo in combinations(hand, 4)]
     preds = hand_model.predict(combos)
@@ -73,8 +75,10 @@ def extract_peg_features(status, move):
 def find_best_peg(legal_moves, status, return_all=False):
     """
     Peg model across all legal moves, return the best move
-    INPUT: legal_moves(list), status(dict)
-    OUPUT: best card to play (str)
+    If returnall is true, we return all the possible moves with pred points
+    INPUT: legal_moves(list), status(dict), returnall
+    OUPUT: best card to play (str) if false,
+            else all possibilities with predicted points
     """
     max_pred_points = 0
     best_move = legal_moves[0]

@@ -100,7 +100,7 @@ def index():
 
 
     session['legal_moves'] = 'null'
-    session['best_move'] = None
+    session['move_scores'] = None
     if request.method == 'POST':
         session['discard_selection'] = request.values['discard_selection']
         return redirect(url_for('index'))
@@ -108,7 +108,7 @@ def index():
     save = False
     if 'true_status' not in session:
         session['true_status'] = cg.update()
-        session['best_move'] = find_best_hand_combination(session['true_status']['hands'][0], session['true_status']['dealer'], return_all=True)
+        session['move_scores'] = find_best_hand_combination(session['true_status']['hands'][0], session['true_status']['dealer'], return_all=True)
     elif session['true_status']['phase'] == 'Deal':
         if 'discard_selection' in session:
             user_response = session['discard_selection'].split(',')
@@ -120,7 +120,7 @@ def index():
             instructions['Turn']['selection'] = 0
         else:
             instructions['Turn']['selection'] = 1
-            session['best_move'] = get_best_peg_response(session['true_status'], 0, return_all=True)
+            session['move_scores'] = get_best_peg_response(session['true_status'], 0, return_all=True)
 
     elif session['true_status']['phase'] in ['Pegging', 'Turn']:
         if session['true_status']['pegger'] == 0:
@@ -129,7 +129,7 @@ def index():
         if session['true_status']['phase'] != 'Pegging Complete':
             opponent_response = get_best_peg_response(session['true_status'], 1)
             session['true_status'] = cg.update(session['true_status'], opponent_response)
-            session['best_move'] = get_best_peg_response(session['true_status'], 0, return_all=True)
+            session['move_scores'] = get_best_peg_response(session['true_status'], 0, return_all=True)
         #user go
         session['legal_moves'] = find_legal_moves(session['true_status']['peg_count'],
                                         session['true_status']['hands'][0]
@@ -156,7 +156,7 @@ def index():
     elif session['true_status']['phase'] == 'Round Complete':
         session['legal_moves'] = 'null'
         session['true_status'] = cg.update(session['true_status'])
-        session['best_move'] = find_best_hand_combination(session['true_status']['hands'][0], session['true_status']['dealer'], return_all=True)
+        session['move_scores'] = find_best_hand_combination(session['true_status']['hands'][0], session['true_status']['dealer'], return_all=True)
         obscure_hand = False
         save = True
     elif session['true_status']['phase'] == 'Game Over':
@@ -206,7 +206,7 @@ def crib():
                                 cue=instructions[session['game_status']['phase']],
                                 card_class=c_class,
                                 legal_moves=session['legal_moves'],
-                                best_move=session['best_move'])
+                                move_scores=session['move_scores'])
     else:
         return redirect(url_for('index'))
 

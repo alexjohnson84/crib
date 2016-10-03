@@ -82,11 +82,12 @@
 
 <button id="submit-button" type="submit" form="card_acts">submit!</button>
 <h5><a href='/reset'>Restart Game</a></h5>
+<br>
+<button type='button' onclick="compare_selection_to_response({{ move_scores }})">test vis</button>
 <hr>
 {{ true_status }}
 <hr>
-{{ best_move }}
+{{ move_scores }}
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/core.js') }}"></script>
-
 {% endblock %}

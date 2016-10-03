@@ -12,7 +12,6 @@ var discard = $('.discard').click(function(e) {
 
 function get_selection(){
   var discard_obj = document.getElementsByClassName("discard card highlight");
-  console.log(discard_obj);
   var selected_d = []
   for (i = 0; i < discard_obj.length; i++) {
         selected_d.push(discard_obj[i].id);
@@ -58,28 +57,26 @@ function validate_form(n, legal_moves){
   return vil && vm;
 }
 
+function find_highest_match(move_scores){
+  max_value = 0;
+  best_selection = move_scores[1][0];
+  for (i = 0; i < move_scores.length; i++) {
+          if(move_scores[i][1] > max_value){
+          	max_value = move_scores[i][1];
+            best_selection = move_scores[i][0];
+          }
+       }
+  return best_selection;
+}
 
-//submit function
-// function submit_discards(n){
-//   var selected_d = [];
-//   var x = document.getElementById("myhand");
-//   // pull highlighted classes
-//   var y = x.getElementsByClassName("discard highlight");
-//   if (y.length == n){
-//     var i;
-//     for (i = 0; i < y.length; i++) {
-//       selected_d.push(y[i].title);
-//     }
-//     //fill form with vals in order to post
-//     document.getElementById('discard_selection').value = selected_d;
-//     console.log(document.getElementById('discard_selection'))
-//     document.getElementById('card_acts').submit()
-//     console.log(document.getElementById('discard_selection').value)
-//     //remove highlight from class
-//     $(".highlight").removeClass("highlight");
-//   } else {
-//     //alert for not passing in 2 cards
-//     alrt_msg = "Please only select ";
-//     alert(alrt_msg.concat(String(n), " cards"));
-//   }
-// }
+function compare_selection_to_response(move_scores){
+  var user_move = get_selection();
+  var best_move = find_highest_match(move_scores);
+  console.log(best_move);
+  console.log(user_move);
+  var classBest = ' best';
+  for(i=0; i < best_move.length; i++){
+    var best_card = document.getElementById(best_move[i]);
+    best_card.className += classBest;
+  }
+}
