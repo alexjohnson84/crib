@@ -29,7 +29,7 @@ model:
 	python models/generate_peg_models.py
 
 model_cv:
-	rm -f graphs/*
+	rm -f graphs/*scores*
 	python models/generate_peg_models.py True
 	python models/generate_hand_models.py True
 
