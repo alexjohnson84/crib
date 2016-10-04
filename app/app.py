@@ -162,6 +162,7 @@ def index():
     elif session['true_status']['phase'] == 'Game Over':
         print "game over logged into db"
         iswin = max(session['true_status']['scores']) == session['true_status']['scores'][0]
+        # import pdb; pdb.set_trace()
         usr = Users.query.filter_by(u_id=user_id).first()
         usr.add_game(iswin)
         db.session.add(usr)
@@ -184,8 +185,6 @@ def index():
     game_status['hands'] = [lookup_cards(hand) for hand in game_status['hands']]
     game_status['peg_phist'] = {key:lookup_cards(val) for key,val in game_status['peg_phist'].iteritems()}
     session['game_status'] = game_status
-    form = ResponseForm()
-
     logging.info({'u_id':user_id, 'log':session['true_status']})
 
     return redirect(url_for('crib'))
@@ -207,13 +206,14 @@ def crib():
                                 card_class=c_class,
                                 legal_moves=session['legal_moves'],
                                 move_scores=session['move_scores'],
-                                user_wl = session['user_wl'])
+                                user_wl=session['user_wl'])
     else:
         return redirect(url_for('index'))
 
 @app.route('/reset', methods=['GET'])
 def reset():
     if 'user_id' in session:
+        # import pdb; pdb.set_trace()
         user_id = deepcopy(session['user_id'])
         session.clear()
         session['user_id'] = user_id

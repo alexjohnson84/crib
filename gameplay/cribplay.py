@@ -65,7 +65,10 @@ def extract_peg_features(status, move):
     OUTPUT: list in the form of : [hand, len(hist), hist, len_opponent, count]
     """
     player = status['pegger']
-    hand = deepcopy(status['hands'][player]).remove(move)
+    try:
+        hand = deepcopy(status['hands'][player]).remove(move)
+    except:
+        import pdb; pdb.set_trace()
     hist = status['peg_hist'] + [move]
     len_opponent = len(status['hands'][abs(player - 1)])
     cps = CribPegScore(hist)

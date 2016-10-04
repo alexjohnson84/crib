@@ -59,6 +59,7 @@ class VisitorTest(unittest.TestCase):
         Helper function to submit the page.  Sends data from selection back
         to the server
         """
+        # time.sleep(0.5)
         self.browser.find_element_by_id('submit-button').click()
 
     def isdealer(self):
