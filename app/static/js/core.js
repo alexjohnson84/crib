@@ -3,7 +3,9 @@ var classHighlight = 'highlight';
 var discard = $('.discard').click(function(e) {
   e.preventDefault();
   currentClass = $(this).get(0).className;
-  if (currentClass == "discard card highlight"){
+  if (currentClass == "discard card highlight" ||
+  currentClass == "discard card best highlight" ||
+  currentClass == "discard card highlight best"){
     $(this).removeClass(classHighlight);
   } else {
     $(this).addClass(classHighlight);

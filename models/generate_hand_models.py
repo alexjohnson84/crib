@@ -98,7 +98,7 @@ class GenerateHandModel(object):
                 (length, time.time() - start)
         append_dict_to_file('graphs/hand_scores.txt', {mod_name: self.scores})
 
-    def build_cv_graph(self, fig_loc):
+    def build_cv_graph(self, fig_loc, plot_title):
         """
         Build matplotlib line graph comparing train/test data across models and
         saves figure to figlog
@@ -116,6 +116,7 @@ class GenerateHandModel(object):
         plt.ylabel('r^2 value')
         plt.ylim([-0.5, 1.1])
         plt.xscale('log')
+        plt.title(plot_title)
         handles, labels = plt.gca().get_legend_handles_labels()
         by_label = OrderedDict(zip(labels, handles))
         legend = plt.legend(

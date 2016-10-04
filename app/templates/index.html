@@ -88,8 +88,10 @@
 <td><button type='button' onclick="compare_selection_to_response({{ move_scores }})"><img id='see-best' src="{{ url_for('static', filename='assets/eyecon.png')}}"></button></td>
 </tr>
 </tbody>
+Peg History
+<br>
+{{ true_status['peg_hist'] }}
 </table>
-{{ move_scores }}
 
 <h5><a href='/reset'>Restart Game</a></h5>
 <br>

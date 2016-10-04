@@ -338,7 +338,6 @@ class CribGame(object):
                                     status['faceup'],
                                     kitty=status['kitty'],
                                     peg_hist=status['peg_hist'],
-                                    peg_phist=status['peg_phist'],
                                     dealer=status['dealer'],
                                     pegger=pegger
                                     )

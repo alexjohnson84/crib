@@ -95,10 +95,10 @@ def main():
     #added if building on ec2
     plt.clf()
     ghm = GenerateHandModel('data/logs/random/hand_base_table.txt')
-    ghm.build_cv_graph('graphs/hand_model_cv.png')
+    ghm.build_cv_graph('graphs/hand_model_cv.png', "Hand Model Comparison")
     plt.clf()
     gpm = GeneratePegModel('data/logs/random/peg_base_table.txt')
-    gpm.build_cv_graph('graphs/peg_model_cv.png')
+    gpm.build_cv_graph('graphs/peg_model_cv.png', "Peg Model Comparison")
 
 if __name__ == '__main__':
     main()

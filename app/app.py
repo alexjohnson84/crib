@@ -120,7 +120,6 @@ def index():
             instructions['Turn']['selection'] = 0
         else:
             instructions['Turn']['selection'] = 1
-            import pdb; pdb.set_trace()
             session['move_scores'] = get_best_peg_response(session['true_status'], 0, return_all=True)
 
     elif session['true_status']['phase'] in ['Pegging', 'Turn']:
@@ -163,7 +162,6 @@ def index():
     elif session['true_status']['phase'] == 'Game Over':
         print "game over logged into db"
         iswin = max(session['true_status']['scores']) == session['true_status']['scores'][0]
-        # import pdb; pdb.set_trace()
         usr = Users.query.filter_by(u_id=user_id).first()
         usr.add_game(iswin)
         db.session.add(usr)
@@ -214,7 +212,6 @@ def crib():
 @app.route('/reset', methods=['GET'])
 def reset():
     if 'user_id' in session:
-        # import pdb; pdb.set_trace()
         user_id = deepcopy(session['user_id'])
         session.clear()
         session['user_id'] = user_id
