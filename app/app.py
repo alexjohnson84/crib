@@ -120,6 +120,7 @@ def index():
             instructions['Turn']['selection'] = 0
         else:
             instructions['Turn']['selection'] = 1
+            import pdb; pdb.set_trace()
             session['move_scores'] = get_best_peg_response(session['true_status'], 0, return_all=True)
 
     elif session['true_status']['phase'] in ['Pegging', 'Turn']:

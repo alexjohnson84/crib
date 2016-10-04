@@ -116,6 +116,7 @@ def get_highest_file(base_dir):
     OUTPUT: integer of the highest file number + 1.
     """
     files = listdir(base_dir)
+    files = [f for f in files if f not in ['hand_base_table.txt', 'peg_base_table.txt']]
     if len(files) > 0:
         minimum_file = max([int(re.search(r'\d+', fil).group())
                             for fil in files]) + 1
@@ -141,7 +142,7 @@ def run_multi_paras(batch_size=2000, rand=True):
     else:
         base_dir = 'data/logs/model/'
     batch_num = get_highest_file(base_dir)
-    batch_data = run_para_games(batch_size)
+    batch_data = run_para_games(batch_size, rand)
     with open(base_dir + 'para_game_%s.txt' % (batch_num), 'w') as pg:
         json.dump(batch_data, pg)
 
