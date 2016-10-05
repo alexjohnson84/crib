@@ -4,12 +4,11 @@
 
 <h2>CribbageCoach</h2>
 
-<h3>Project Background:</h3>
+<h3 id="pb">Project Background:</h3>
   <p>
     I don't think a write-up on this project would be complete without first a
     note about the inspiration for this project.
   </p>
-  <br>
   <p>
     I have a confession to make, I'm really bad at cribbage.  I'm not just bad,
     but bad in a really specific way.  There have been multiple scenarios where
@@ -19,19 +18,16 @@
     "Go Fish" instead.  It's been one of the games I've always been consistently
     bad at.
   </p>
-  <br>
   <p>
-    After thinking about it a bit, I did have an ace up my sleeve.  Or a
-    twenty-nine in the boot, whatever appropriate card-appropriate expression
-    is.  I knew how to apply machine learning, and
+    After thinking about it a bit,I thought that if I can't learn how to be
+    a better cribbage player, I can have a computer learn how to be a cribbage
+    player, and teach me how to be a better player. So by applying maching learning and
     <a href="https://en.wikipedia.org/wiki/Cross_Industry_Standard_Process_for_Data_Mining">CRISP-DM</a>.
-    So if I can't learn how to be a better cribbage player, I can have a
-    computer learn how to be a cribbage player, and teach me how to be a better
-    player.
+    I built a cribbage AI application.
   </p>
   <hr>
 <h3> The CRISP-DM Process </h3>
-<h4> Business Understanding </h4>
+<h4 id='bu'> Business Understanding </h4>
   <p>
     As outlined in the Project Background, I'm really bad at cribbage, and what
     I needed was a tool to point out if I was making bad moves or not.  I
@@ -46,7 +42,7 @@
     I wanted an application to go along with the maching learning models, so other
     Cribbage Players can use the application and my models to improve their game.
   </p>
-<h4> Data Understanding </h4>
+<h4 id='du'> Data Understanding </h4>
   <p>
     Had an issue with data.  I had none. I looked for a bit to find a similar
     dataset to what I was trying to produce, but came up short (if anyone has
@@ -68,7 +64,7 @@
     successful application.  I set up a script to run random moves for discards
     and pegging, ran for 200,000 full games and stored the logs.
   </p>
-  <h4>Data Cleaning</h4>
+  <h4 id='dc'>Data Cleaning</h4>
     <p>
       I had log files, but I needed to set up my ABT (analytic base table) for
       each of my models to run my models on.
@@ -186,7 +182,7 @@
     adventageous position.  For the time being, I'm setting this aside for
     future improvements
   </p>
-  <h4> Data Modeling </h4>
+  <h4 id="dm"> Data Modeling </h4>
   <p>
     Ok, now that we have our ABTs, now to the fun part, Modeling!
   </p>
@@ -253,7 +249,7 @@
   <p>
     Let's see how they performed!
   </p>
-<h4>Model Evaluation</h4>
+<h4 id='me'>Model Evaluation</h4>
   <p> First step, let's see how well the models did across datasets of varying sizes.
     Our intuition is that we won't have a perfect model (luck still is a major
     factor, and we're avoiding leakage).  But what we want is to have similar
@@ -298,7 +294,7 @@
     games.
   </p>
 <hr>
-<h2>Future Development</h2>
+<h2 id='fd'>Future Development</h2>
 <p>
   Not too bad for a first pass, but the model isn't perfected yet. Here's a few ideas for improvement on iteration 2
 </p>
