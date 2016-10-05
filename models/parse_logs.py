@@ -104,7 +104,7 @@ class BuildBaseTables(object):
                                 sum([len(p_hist) for p_hist in game_val[i]
                                      ['Pegging'][j]['peg_phist'].values()]),
                                 game_val[i]['Pegging'][j]['peg_hist'],
-                                len(game_val[i]['Pegging'][j]['hands'][pegger]),
+                                len(game_val[i]['Pegging'][j]['hands'][abs(pegger - 1)]),
                                 game_val[i]['Pegging'][j]['peg_count'],
                                 score_diff[abs(pegger - 1)]]
                         abt.append(line)

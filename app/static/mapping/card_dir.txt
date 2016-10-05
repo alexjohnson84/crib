@@ -65,4 +65,5 @@
 "QS2" : "cards/queen_of_spades2.png",
 "QS" : "cards/queen_of_spades.png",
 "RJ" : "cards/red_joker.png",
-"BB" : "cards/blank_blue.png"}
+"BB" : "cards/blank_blue.png",
+"GO" : "cards/go_button.png"}

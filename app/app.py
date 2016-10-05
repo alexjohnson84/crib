@@ -223,5 +223,12 @@ def reset():
 
     return redirect(url_for('index'))
 
+@app.route('/blog')
+def blog():
+    if 'user_wl' in session:
+        user_wl = session['user_wl']
+    else:
+        user_wl = [0,0]
+    return render_template('blog.html', user_wl=session['user_wl'])
 if __name__ == '__main__':
     app.run(debug=True)

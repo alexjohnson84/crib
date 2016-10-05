@@ -17,6 +17,7 @@ generate_modeled:
 clean:
 	rm -rf data/logs*
 	rm -f data/*base_table.txt
+	mkdir data
 	mkdir data/logs
 	mkdir data/logs/random
 	mkdir data/logs/model
@@ -65,3 +66,4 @@ full_build:
 
 generate_graphs:
 	python graphs/generate_graphs.py
+	cp graphs/*.png app/static/graphs/

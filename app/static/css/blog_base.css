@@ -1,0 +1,13 @@
+code {
+  white-space: pre;
+}
+img.graph {
+  height: 333px;
+  width: 500px;
+}
+table, th, td {
+  text-align:center;
+  border: 1px solid black;
+  margin-left:auto;
+  margin-right:auto;
+}

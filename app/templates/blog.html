@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="{{ url_for('static', filename='css/blog_base.css') }}" rel="stylesheet" type="text/css">
+
+<h2>CribbageCoach</h2>
+
+<h3>Project Background:</h3>
+  <p>
+    I don't think a write-up on this project would be complete without first a
+    note about the inspiration for this project.
+  </p>
+  <br>
+  <p>
+    I have a confession to make, I'm really bad at cribbage.  I'm not just bad,
+    but bad in a really specific way.  There have been multiple scenarios where
+    I teach cribbage to others, and they end up beating me during our first game,
+    you know, the one with the "practice hands." Then the second, then the third,
+    then I throw the board across the room in frustration and suggest we play
+    "Go Fish" instead.  It's been one of the games I've always been consistently
+    bad at.
+  </p>
+  <br>
+  <p>
+    After thinking about it a bit, I did have an ace up my sleeve.  Or a
+    twenty-nine in the boot, whatever appropriate card-appropriate expression
+    is.  I knew how to apply machine learning, and
+    <a href="https://en.wikipedia.org/wiki/Cross_Industry_Standard_Process_for_Data_Mining">CRISP-DM</a>.
+    So if I can't learn how to be a better cribbage player, I can have a
+    computer learn how to be a cribbage player, and teach me how to be a better
+    player.
+  </p>
+  <hr>
+<h3> The CRISP-DM Process </h3>
+<h4> Business Understanding </h4>
+  <p>
+    As outlined in the Project Background, I'm really bad at cribbage, and what
+    I needed was a tool to point out if I was making bad moves or not.  I
+    determined that this project would be made up of 3 parts.
+  </p>
+  <ol>
+    <li>Stateless Cribbage API</li>
+    <li>Machine Learning Models</li>
+    <li>Frontend Application</li>
+  </ol>
+  <p>
+    I wanted an application to go along with the maching learning models, so other
+    Cribbage Players can use the application and my models to improve their game.
+  </p>
+<h4> Data Understanding </h4>
+  <p>
+    Had an issue with data.  I had none. I looked for a bit to find a similar
+    dataset to what I was trying to produce, but came up short (if anyone has
+    some I would be interested)
+  </p>
+  <p>
+    If I had no data, I needed to generate my own.  I built a cribbage API that
+    ingested dictionary requests, and a particular action, and it moved the
+    request into the next phase of the game. As for user actions, there are two
+    phases of the game where users make any moves of significance to the final
+    outcome.
+  </p>
+  <ol>
+    <li>Discard (pick 2 of 6 to discard)</li>
+    <li>Pegging (play 1 card at a time)</li>
+  </ol>
+  <p>
+    I knew I would need to build a model for each if I was going to have a
+    successful application.  I set up a script to run random moves for discards
+    and pegging, ran for 200,000 full games and stored the logs.
+  </p>
+  <h4>Data Cleaning</h4>
+    <p>
+      I had log files, but I needed to set up my ABT (analytic base table) for
+      each of my models to run my models on.
+    </p>
+    <h5>Hand Model</h5>
+    <p>
+      For the hand model, the relevant features would be for each round, what
+      was the 4 card, was the person the dealer, hand and what was the delta of
+      the user's score for that round? Like so:
+    </p>
+    <table width="70%">
+    <tbody>
+      <tr>
+        <td>Hand</td>
+
+        <td>Dealer</td>
+
+        <td>Score</td>
+      </tr>
+
+      <tr>
+        <td>
+          <p>"['2D', '9D', '10C', '8H']"</p>
+        </td>
+
+        <td>True</td>
+
+        <td>10</td>
+      </tr>
+
+      <tr>
+        <td>
+          <p>"['5C', 'AD', 'KC', 'QD']"</p>
+        </td>
+
+        <td>False</td>
+
+        <td>5</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    Think that's good enough for the base table for the first model.  Let's
+    move onto the ABT for the Peg Model.
+  </p>
+
+  <h4>Peg Model</h4>
+  <p>
+    Setting up the ABT for the Hand Model was simple enough, but there are a
+    few more considerations to make with the Peg Model.  Such as "What's the Peg Count?", "Can I
+    get a pair or straight from the pegging history?", "How many cards does the opponent have?"
+  </p>
+  <p>
+    After asking myself those questions, I parsed the logs and game up with a peg base table setup as follows:
+  </p>
+  <table width="70%">
+    <tbody>
+      <tr>
+        <td>Hand</td>
+
+        <td>cards_played</td>
+
+        <td>peg_history</td>
+
+        <td>len_opponent</td>
+
+        <td>count</td>
+
+        <td>score</td>
+      </tr>
+
+      <tr>
+        <td>
+          <p>"['9D','10C','2D','8H']"</p>
+        </td>
+
+        <td>1</td>
+
+        <td>
+          <p>['5C']</p>
+        </td>
+
+        <td>3</td>
+
+        <td>5</td>
+
+        <td>0</td>
+      </tr>
+
+      <tr>
+        <td>
+          <p>"['9D', '2D', '8H']"</p>
+        </td>
+
+        <td>2</td>
+
+        <td>
+          <p>['10C','5C']</p>
+        </td>
+
+        <td>3</td>
+
+        <td>15</td>
+
+        <td>2</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    A few observations from this ABT.  Looking at the first line of data above,
+    we won't have any penalty for leading with a five.  Which is not something
+    that you want to generally do as the opponent has a higher likelihood of
+    getting 2 points for 15.  This observation presents a flaw with the
+    current model, as we don't penalize anything for putting the opponent in an
+    adventageous position.  For the time being, I'm setting this aside for
+    future improvements
+  </p>
+  <h4> Data Modeling </h4>
+  <p>
+    Ok, now that we have our ABTs, now to the fun part, Modeling!
+  </p>
+  <p>
+    A note on model selection:  We have a continuous variable that we're trying
+    to predict, so we know we'll need a regression model.  As our results are
+    based upon groups of features being present, using a decision tree would be
+    a good fit for the type of data we're working with.
+  </p>
+  <p>
+    We need to set up a vectorizer class to enable our lists as string to be
+    stored appropriately.  By using an Item Selector class (taken from
+    <a href='http://scikit-learn.org/stable/auto_examples/hetero_feature_union.html#sphx-glr-auto-examples-hetero-feature-union-py'>sklearn-featureunion</a> documentation)
+    and creating some custom extraction classes that can be found <a href='https://github.com/alexjohnson84/crib/blob/master/models/utils.py'>here</a>
+  </p>
+  <p>
+    After setting up our classes, we can setup our pipeline classes.  This helps
+    us santize our inputs (just match the abt), and overall it makes it easier
+    to change things later on (maybe we'll even do some A/B Testing...).
+  </p>
+  <h5> Hand Model Pipeline </h5>
+  <code>
+    self.dtr = Pipeline([
+            ('featureextract', HandFeatureExtractor()),
+            ('union', FeatureUnion(
+                transformer_list=[
+                    ('isdealer', ItemSelector(key='X_dealer')),
+                    ('hand', Pipeline([
+                        ('selector', ItemSelector(key='X_hand')),
+                        ('vect', DictVectorizer())
+                    ]))
+                ])),
+            ('mod', self.models[mod_name])
+        ])
+        self.dtr.fit(X, y)
+    </code>
+  <h5>Peg Model Pipeline</h5>
+  <code>
+    self.dtr = Pipeline([
+                        ('featureextract', PegFeatureExtractor()),
+                        ('union', FeatureUnion(
+                            transformer_list=[
+                                ('pegcount', ItemSelector(key='X_cnt')),
+                                ('opponentlength', ItemSelector(key='X_lo')),
+                                ('cardsplayed', ItemSelector(key='X_cp')),
+                                ('transformed_feats', Pipeline([
+                                    ('selector', ItemSelector(key='X_dict')),
+                                    ('vect', DictVectorizer())
+                                ]))
+                            ])),
+                        ('mod', self.models[mod_name])
+                        ])
+    self.dtr.fit(X, y)
+  </code>
+  <p>
+    In both models, we run the pipeline by iterating through 3 models
+    (stored in self.models)
+  </p>
+  <ol>
+    <li>Decision Tree Regressor</li>
+    <li>Bagging Regressor</li>
+    <li>Random Forest Regressor</li>
+  </ol>
+  <p>
+    Let's see how they performed!
+  </p>
+<h4>Model Evaluation</h4>
+  <p> First step, let's see how well the models did across datasets of varying sizes.
+    Our intuition is that we won't have a perfect model (luck still is a major
+    factor, and we're avoiding leakage).  But what we want is to have similar
+    R^2 values across train/test groups, then we're getting a decent model.
+  </p>
+  <img class='graph' src="{{ url_for('static', filename='graphs/hand_model_cv.png') }}">
+  <img class='graph' src="{{ url_for('static', filename='graphs/peg_model_cv.png') }}">
+  <p>
+    Ok, so we see that as we get to ~4M rows in our ABT, that our model is
+    converging.  Let's use our bagging regressor trained on 4M rows.
+  </p>
+  <h5>Model Distributions</h5>
+  <p>
+    Next question, do these models perform well? I regenerated a new set
+    of logs by running our models instead of random choice.  We want to see the average points per round for the hand model, or by pegging action
+    for the peg model.
+  </p>
+  <img class='graph' src="{{ url_for('static', filename='graphs/hand_score_distribution.png') }}">
+  <img class='graph' src="{{ url_for('static', filename='graphs/peg_score_distribution.png') }}">
+  <p>
+    We see that that the model is doing better in both cases when compared to chance.
+    Let's extrapolate this out to an entire game.
+  </p>
+  <p>
+    Using the model, the average number of rounds it takes to get to a score of 120 is ~8.6
+    I resampled the hand distribution (remember, hand ABT contains TOTAL score,
+    meaning scoring+peg) for the average number of rounds, and got the following distribution.
+  </p>
+    <img class='graph' src="{{ url_for('static', filename='graphs/full_game_distribution.png') }}">
+
+  <h4>Deployment/True Evaluation</h4>
+  <p>
+    OK, so we see that our model does better than random choice.  So what?
+    We want it to beat real people.
+  </p>
+  <p>
+    The 4M bagging regressor model is currently deployed on the frontend of CribbageCoach. I encourage you to play and
+  </p>
+  <p>
+    I haven't incoporated user data (I don't have very much, this may be a part 2), but first game
+    around I lost to the model 110 to 120, and continued to lose the next 3
+    games.
+  </p>
+<hr>
+<h2>Future Development</h2>
+<p>
+  Not too bad for a first pass, but the model isn't perfected yet. Here's a few ideas for improvement on iteration 2
+</p>
+<ol>
+  <li>Penalize model for putting users in an advantageous position</li>
+  <li>Set up reinforcement learning model</li>
+  <li>Train on more data</li>
+</ol>
+{% endblock %}
