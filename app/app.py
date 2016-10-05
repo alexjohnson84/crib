@@ -8,7 +8,6 @@ from forms import ResponseForm
 import random
 import datetime
 from pprint import pprint
-# from app.mod import UserLogs
 import logging
 import uuid
 logging.basicConfig(filename='app/example.log', level=logging.INFO, format='%(asctime)s %(message)s')
@@ -80,13 +79,17 @@ def get_best_peg_response(status, active_player, return_all=False):
         if len(legal_moves) == 0:
             response = ['GO']
         else:
-            response = find_best_peg(legal_moves, status, return_all)
+            if status['phase'] != 'Game Over':
+                response = find_best_peg(legal_moves, status, return_all)
+            else:
+                print "saved the day"
+                response = None
         return response
 
 
 cg = CribGame()
 
-
+@app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     if 'user_id' not in session:
@@ -137,7 +140,6 @@ def index():
         # run go automatically
         while session['legal_moves'] == []:
             if session['true_status']['phase'] != 'Pegging Complete':
-                # if len(session['true_status']['hands'][0]) < 0:
                 session['true_status'] = cg.update(session['true_status'], ['GO'])
                 opponent_response = get_best_peg_response(session['true_status'], 1)
                 session['true_status'] = cg.update(session['true_status'], opponent_response)
@@ -147,7 +149,6 @@ def index():
 
         if session['true_status']['phase'] == 'Pegging Complete':
             session['legal_moves'] = 'null'
-
 
     elif session['true_status']['phase'] == 'Pegging Complete':
         session['legal_moves'] = 'null'
@@ -188,7 +189,7 @@ def index():
 
     return redirect(url_for('crib'))
 
-@app.route('/')
+
 @app.route('/crib', methods=['GET'])
 def crib():
     form = ResponseForm()
