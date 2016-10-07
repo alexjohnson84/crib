@@ -89,7 +89,7 @@ def get_best_peg_response(status, active_player, return_all=False):
 
 cg = CribGame()
 
-@app.route('/')
+
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     if 'user_id' not in session:
@@ -124,6 +124,7 @@ def index():
         else:
             instructions['Turn']['selection'] = 1
             session['move_scores'] = get_best_peg_response(session['true_status'], 0, return_all=True)
+        print "turn selection ", instructions['Turn']['selection']
 
     elif session['true_status']['phase'] in ['Pegging', 'Turn']:
         if session['true_status']['pegger'] == 0:
@@ -209,7 +210,8 @@ def crib():
                                 user_wl=session['user_wl'])
     else:
         return redirect(url_for('index'))
-
+        
+@app.route('/')
 @app.route('/reset', methods=['GET'])
 def reset():
     if 'user_id' in session:

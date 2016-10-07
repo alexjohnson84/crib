@@ -5,4 +5,5 @@ data/*
 config.py
 app.db
 *.log
-graphs/*
+graphs/*png
+graphs/*txt
