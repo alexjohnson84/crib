@@ -92,6 +92,7 @@ cg = CribGame()
 
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+    session['instructions'] = deepcopy(instructions)
     if 'user_id' not in session:
         user_id = str(uuid.uuid4())
         session['user_id'] = user_id
@@ -120,11 +121,11 @@ def index():
     elif session['true_status']['phase'] == 'Discard':
         session['true_status'] = cg.update(session['true_status'])
         if session['true_status']['dealer'] == 0:
-            instructions['Turn']['selection'] = 0
+            session['instructions']['Turn']['selection'] = 0
         else:
-            instructions['Turn']['selection'] = 1
+            session['instructions']['Turn']['selection'] = 1
             session['move_scores'] = get_best_peg_response(session['true_status'], 0, return_all=True)
-        print "turn selection ", instructions['Turn']['selection']
+        print "turn selection ", session['instructions']['Turn']['selection']
 
     elif session['true_status']['phase'] in ['Pegging', 'Turn']:
         if session['true_status']['pegger'] == 0:
@@ -203,14 +204,14 @@ def crib():
         return render_template('index.html',  game_status=session['game_status'],
                                 true_status=session['true_status'],
                                 form=form,
-                                cue=instructions[session['game_status']['phase']],
+                                cue=session['instructions'][session['game_status']['phase']],
                                 card_class=c_class,
                                 legal_moves=session['legal_moves'],
                                 move_scores=session['move_scores'],
                                 user_wl=session['user_wl'])
     else:
         return redirect(url_for('index'))
-        
+
 @app.route('/')
 @app.route('/reset', methods=['GET'])
 def reset():
