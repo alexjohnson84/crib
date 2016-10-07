@@ -79,6 +79,13 @@
 {{ form.discard_selection }}
 <!-- {{ form.current_status }} -->
 <p>{{ cue['cue'] }}</p>
+{% if game_status['peg_hist'] != [] %}
+<h3>Peg History</h3>
+{% for card in game_status['peg_hist'] %}
+<img src='{{ card[0][1] }}' class='card' height='70', width='50', border=2>
+{% endfor %}
+{% endif %}
+<br>
 
 <table>
 <tbody>
@@ -88,16 +95,13 @@
 <td><button type='button' onclick="compare_selection_to_response({{ move_scores }})"><img id='see-best' src="{{ url_for('static', filename='assets/eyecon.png')}}"></button></td>
 </tr>
 </tbody>
-Peg History
-<br>
-{{ true_status['peg_hist'] }}
 </table>
+<br>
 
 <h5><a href='/reset'>Restart Game</a></h5>
-<br>
-{{ true_status }}
 
 <!-- commented out for debugging <hr>
+{{ true_status }}
 <hr>
 {{ move_scores }} -->
 

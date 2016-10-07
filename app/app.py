@@ -184,6 +184,7 @@ def index():
         game_status['peg_phist'][str(dealer)] = game_status['kitty']
 
     game_status['hands'] = [lookup_cards(hand) for hand in game_status['hands']]
+    game_status['peg_hist']= [lookup_cards([hand]) for hand in game_status['peg_hist']]
     game_status['peg_phist'] = {key:lookup_cards(val) for key,val in game_status['peg_phist'].iteritems()}
     session['game_status'] = game_status
     logging.info({'u_id':user_id, 'log':session['true_status']})

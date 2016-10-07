@@ -123,7 +123,7 @@ class VisitorTest(unittest.TestCase):
         """
         self.single_game()
 
-    def test_multiple_games(self, n=20):
+    def test_multiple_games(self, n=5):
         """
         Run multiple games.  Needs testing added to make sure the user log data
         is added to the database.

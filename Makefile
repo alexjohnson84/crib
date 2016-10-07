@@ -59,11 +59,6 @@ install:
 	cc_virt/bin/pip install -r requirements.txt
 	make build_config
 
-
-full_build:
-	pip install -r requirements.txt
-	make build
-
 generate_graphs:
 	python graphs/generate_graphs.py
 	cp graphs/*.png app/static/graphs/
