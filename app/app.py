@@ -82,7 +82,6 @@ def get_best_peg_response(status, active_player, return_all=False):
             if status['phase'] != 'Game Over':
                 response = find_best_peg(legal_moves, status, return_all)
             else:
-                print "saved the day"
                 response = None
         return response
 
@@ -234,5 +233,10 @@ def blog():
     else:
         user_wl = [0,0]
     return render_template('blog.html', user_wl=session['user_wl'])
+
+@app.errorhandler(500)
+def server_error():
+    return redirect(url_for('reset'))
+
 if __name__ == '__main__':
     app.run(debug=True)

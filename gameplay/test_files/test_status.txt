@@ -253,7 +253,7 @@
       ],
       'scores': [2, 5],
       'kitty': ['4S', 'QH', '10S', 'AS'],
-      'peg_phist': {'0': ['9H', '6S', 'JD', '4H'], '1': ['6D', '10C', '9S', 'AC']},
+      'peg_phist': {'0': [], '1': []},
       'peg_hist': ['9H', '6D', '6S', '10C', 'JD', '9S', '4H', 'AC'],
       'dealer': 1,
       'pegger': 0,

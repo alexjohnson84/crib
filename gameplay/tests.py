@@ -125,7 +125,7 @@ class TestGamePlay(unittest.TestCase):
                                      set(play['hands'][i])
                                      )
                     self.assertEqual(set(new_status['peg_phist'][str(i)]),
-                                     set(play['peg_phist'][str(i)])
+                                     set(play['peg_phist'][str(i)]), play['peg_phist'][str(i)]
                                      )
                 old_status = new_status
 
@@ -149,6 +149,12 @@ class TestSpecialCases(unittest.TestCase):
         cg = CribGame()
         new_status = cg.update(old_status, ['GO'])
         self.assertEqual(new_status['phase'], 'Pegging Complete')
+    def test_game_end_during_pegging(self):
+        with open('gameplay/test_files/test_special_cases.txt', 'r') as th:
+            old_status = eval(th.read())['test_game_end_during_pegging']
+        cg = CribGame()
+        new_status = cg.update(old_status, None)
+        self.assertEqual(new_status['phase'], 'Game Over')
 
 
 class TestHandScoring(unittest.TestCase):

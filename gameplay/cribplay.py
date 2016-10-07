@@ -149,7 +149,7 @@ class CribGame(object):
             scores = status['scores']
         else:
             scores = [0, 0]
-        if max(scores) <= 120:
+        if max(scores) < 120:
             if status is not None:
                 self.current_phase = status['phase']
             if status is None:

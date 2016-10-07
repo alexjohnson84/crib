@@ -17,5 +17,21 @@
 				'faceup': 'KC',
 				'pegger': 1,
 				'peg_hist': ['8D', '5C', '5D', '3H', 'JH', 'GO', 'KD', '2H', 'GO', 'JD']
-			}
+			},
+  "test_game_end_during_pegging" :  {
+        'peg_count': 20,
+        'deck': ['QD', '2S', '5C', '3D', 'KD', '9D', '9C', 'AC', 'KS', 'AD', 'QH', '10H', '8C', 'JH', '6S', '4S', '5D', '5S', '7C', '2D', 'AH', 'JC', 'JD', 'KC', '7H', '10S', 'JS', '9H', '3S', '6H', '8S', 'QS', '8H', '7D', 'KH', '4H', '2H', '6D', '2C'],
+        'pegger': 0,
+        'faceup': '6C',
+        'peg_hist': ['4C', '8D', '5H', '3C'],
+        'kitty': ['4D', 'AS', 'QC', '3H'],
+        'phase': 'Pegging',
+        'scores': [68, 120],
+        'hands': [['7S', '9S'], ['10D', '10C']],
+        'peg_phist': {
+          '1': ['8D', '3C'],
+          '0': ['4C', '5H']
+          },
+        'dealer': 1
+      }
 }

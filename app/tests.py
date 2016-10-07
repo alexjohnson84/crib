@@ -20,6 +20,7 @@ class VisitorTest(unittest.TestCase):
         self.browser = webdriver.Firefox()
         self.browser.get_cookies()
         self.browser.get('http://127.0.0.1:5000/reset')
+        # self.browser.get('http://www.cribbagecoach.com')
 
     def tearDown(self):
         """
@@ -122,7 +123,7 @@ class VisitorTest(unittest.TestCase):
         """
         self.single_game()
 
-    def test_multiple_games(self, n=5):
+    def test_multiple_games(self, n=20):
         """
         Run multiple games.  Needs testing added to make sure the user log data
         is added to the database.
