@@ -1,8 +1,10 @@
 language: python
 python:
   - "2.7"
+before_install:
+ - sudo apt-get install -qq python-numpy python-scipy
 # command to install dependencies
 install:
-  - cat requirements.txt | xargs pip install
+  - pip install -r requirements.txt
 # command to run tests
 script: make test
