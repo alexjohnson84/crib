@@ -56,6 +56,7 @@ build_config:
 	echo "'" >> config.py
 
 install:
+	# Setup Venv, install pip requirements, and rebuild configuration file
 	virtualenv cc_virt
 	cc_virt/bin/pip install -r requirements.txt
 	make build_config
