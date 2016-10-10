@@ -19,6 +19,5 @@ scipy==0.18.1
 scikit-learn==0.17.1
 selenium==2.53.6
 six==1.10.0
-sklearn==0.0
 wsgiref==0.1.2
 flask_sqlalchemy
