@@ -12,6 +12,9 @@ before_install:
   - conda update --yes conda
 # command to install dependencies
 install:
+  - conda create --yes -n test python=$TRAVIS_PYTHON_VERSION
+  - source activate test
+  - conda install --yes numpy=1.11.1 scipy=0.18.1 pip
   - pip install -r requirements.txt
 # command to run tests
 script: make test
