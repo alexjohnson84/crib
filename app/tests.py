@@ -19,8 +19,8 @@ class VisitorTest(unittest.TestCase):
         """
         self.browser = webdriver.Firefox()
         self.browser.get_cookies()
-        # self.browser.get('http://127.0.0.1:5000/reset')
-        self.browser.get('http://www.cribbagecoach.com')
+        self.browser.get('http://127.0.0.1:5000/reset')
+        # self.browser.get('http://www.cribbagecoach.com')
 
     def tearDown(self):
         """

@@ -3,7 +3,22 @@
 ---
 
 [CribbageCoach Live Site](http://www.cribbagecoach.com)
+
 [Project Write-Up](http://www.cribbagecoach.com/blog)
+
+### Status:
+
+[![Build Status](https://travis-ci.org/alexjohnson84/crib.svg?branch=master)](https://travis-ci.org/alexjohnson84/crib)
+
+Note: Test Suite currently only covers the Business Logic behind the API and validates that the current models load into the a usable form by the application.  It does not test the frontend.  To do so, download the repo and run the following to run automated games against the frontend:
+
+```bash
+# start flask application on local server
+make play
+#in separate terminal tab
+make testapp
+```
+
 
 ### Overview:
 CribbageCoach consists of 3 parts
