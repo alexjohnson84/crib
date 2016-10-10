@@ -17,4 +17,7 @@ install:
   - conda install --yes numpy=1.11.1 scipy=0.18.1 matplotlib pip
   - pip install -r requirements.txt
 # command to run tests
-script: make test
+script:
+  - pwd
+  - cd crib 
+  - make test
