@@ -20,6 +20,6 @@ install:
 script:
   - pwd
   - python -c "import sys; print sys.path"
-  - python -c "import sys, os; sys.path.append(os.getcwd())"
+  - export PYTHONPATH=$PYTHONPATH:/home/travis/build/alexjohnson84/crib
   - python -c "import sys; print sys.path"
   - make test
