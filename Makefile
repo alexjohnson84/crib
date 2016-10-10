@@ -43,6 +43,7 @@ build:
 	make generate_modeled
 
 play:
+	# Start Flask App on Local Machine
 	python app/app.py
 
 build_config:
