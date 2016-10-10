@@ -152,7 +152,8 @@ class HandFeatureExtractor(BaseEstimator, TransformerMixin):
 
 class GenerateModelBaseClass(object):
     """
-    Generate the peg model object
+    Base class for model generation.  Used for generating hand and peg models,
+    and provides a base to both generate and cross validate new models
     """
 
     def __init__(self, path):
