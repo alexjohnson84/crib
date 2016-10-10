@@ -37,13 +37,13 @@ def main(input_path, output_path, cv=False):
     ghm = GenerateHandModel(input_path)
     ghm.transform(y_idx=1)
     if cv:
-        lengths = [10, 100, 1000]#, 10000, 100000, 1000000, 2500000, 4497780]
+        lengths = [10, 100, 1000, 10000, 100000, 1000000, 2500000, 4497780]
         ghm.cv_pipeline_models('graphs/hand_scores.txt', lengths)
         ghm.build_cv_graph('graphs/hand_cv_scores.png',
                             'Hand Model Performance Across Models',
                             'graphs/hand_scores.txt')
     else:
-        ghm.run_full_model('br', 400)
+        ghm.run_full_model('br')
         ghm.save_model(output_path)
 
 if __name__ == '__main__':

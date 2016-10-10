@@ -43,13 +43,13 @@ def main(input_path, output_path, cv=False):
     ghm = GeneratePegModel(input_path)
     ghm.transform(y_idx=5)
     if cv:
-        lengths = [10, 100, 1000] #, 10000, 100000, 1000000, 2000000, 3000000, 4000000]
+        lengths = [10, 100, 1000, 10000, 100000, 1000000, 2000000, 3000000, 4000000]
         ghm.cv_pipeline_models('graphs/peg_scores.txt', lengths)
         ghm.build_cv_graph('graphs/peg_cv_scores.png',
                             'Pegging Model Performance Across Models',
                             'graphs/peg_scores.txt')
     else:
-        ghm.run_full_model('br', 400)#00000)
+        ghm.run_full_model('br', 4000000)
         ghm.save_model(output_path)
 
 if __name__ == '__main__':
