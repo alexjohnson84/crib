@@ -91,105 +91,108 @@ cg = CribGame()
 
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    session['instructions'] = deepcopy(instructions)
-    if 'user_id' not in session:
-        user_id = str(uuid.uuid4())
-        session['user_id'] = user_id
-        usr = Users(user_id)
-        db.session.add(usr)
-        db.session.commit()
-    else:
-        user_id = session['user_id']
-
-
-    session['legal_moves'] = 'null'
-    session['move_scores'] = None
-    if request.method == 'POST':
-        session['discard_selection'] = request.values['discard_selection']
-        return redirect(url_for('index'))
-    obscure_hand = True
-    save = False
-    if 'true_status' not in session:
-        session['true_status'] = cg.update()
-        session['move_scores'] = find_best_hand_combination(session['true_status']['hands'][0], session['true_status']['dealer'], return_all=True)
-    elif session['true_status']['phase'] == 'Deal':
-        if 'discard_selection' in session:
-            user_response = session['discard_selection'].split(',')
-            opponent_response = find_best_hand_combination(session['true_status']['hands'][1], session['true_status']['dealer'])
-            session['true_status'] = cg.update(session['true_status'], [user_response, opponent_response])
-    elif session['true_status']['phase'] == 'Discard':
-        session['true_status'] = cg.update(session['true_status'])
-        if session['true_status']['dealer'] == 0:
-            session['instructions']['Turn']['selection'] = 0
+    try:
+        session['instructions'] = deepcopy(instructions)
+        if 'user_id' not in session:
+            user_id = str(uuid.uuid4())
+            session['user_id'] = user_id
+            usr = Users(user_id)
+            db.session.add(usr)
+            db.session.commit()
         else:
-            session['instructions']['Turn']['selection'] = 1
-            session['move_scores'] = get_best_peg_response(session['true_status'], 0, return_all=True)
-        print "turn selection ", session['instructions']['Turn']['selection']
+            user_id = session['user_id']
 
-    elif session['true_status']['phase'] in ['Pegging', 'Turn']:
-        if session['true_status']['pegger'] == 0:
-            user_response = session['discard_selection']
-            session['true_status'] = cg.update(session['true_status'], user_response)
-        if session['true_status']['phase'] != 'Pegging Complete':
-            opponent_response = get_best_peg_response(session['true_status'], 1)
-            session['true_status'] = cg.update(session['true_status'], opponent_response)
-            session['move_scores'] = get_best_peg_response(session['true_status'], 0, return_all=True)
-        #user go
-        session['legal_moves'] = find_legal_moves(session['true_status']['peg_count'],
-                                        session['true_status']['hands'][0]
-                                        )
-        # run go automatically
-        while session['legal_moves'] == []:
+
+        session['legal_moves'] = 'null'
+        session['move_scores'] = None
+        if request.method == 'POST':
+            session['discard_selection'] = request.values['discard_selection']
+            return redirect(url_for('index'))
+        obscure_hand = True
+        save = False
+        if 'true_status' not in session:
+            session['true_status'] = cg.update()
+            session['move_scores'] = find_best_hand_combination(session['true_status']['hands'][0], session['true_status']['dealer'], return_all=True)
+        elif session['true_status']['phase'] == 'Deal':
+            if 'discard_selection' in session:
+                user_response = session['discard_selection'].split(',')
+                opponent_response = find_best_hand_combination(session['true_status']['hands'][1], session['true_status']['dealer'])
+                session['true_status'] = cg.update(session['true_status'], [user_response, opponent_response])
+        elif session['true_status']['phase'] == 'Discard':
+            session['true_status'] = cg.update(session['true_status'])
+            if session['true_status']['dealer'] == 0:
+                session['instructions']['Turn']['selection'] = 0
+            else:
+                session['instructions']['Turn']['selection'] = 1
+                session['move_scores'] = get_best_peg_response(session['true_status'], 0, return_all=True)
+            print "turn selection ", session['instructions']['Turn']['selection']
+
+        elif session['true_status']['phase'] in ['Pegging', 'Turn']:
+            if session['true_status']['pegger'] == 0:
+                user_response = session['discard_selection']
+                session['true_status'] = cg.update(session['true_status'], user_response)
             if session['true_status']['phase'] != 'Pegging Complete':
-                session['true_status'] = cg.update(session['true_status'], ['GO'])
                 opponent_response = get_best_peg_response(session['true_status'], 1)
                 session['true_status'] = cg.update(session['true_status'], opponent_response)
+                session['move_scores'] = get_best_peg_response(session['true_status'], 0, return_all=True)
+            #user go
             session['legal_moves'] = find_legal_moves(session['true_status']['peg_count'],
-                                                        session['true_status']['hands'][0]
-                                                        )
+                                            session['true_status']['hands'][0]
+                                            )
+            # run go automatically
+            while session['legal_moves'] == []:
+                if session['true_status']['phase'] != 'Pegging Complete':
+                    session['true_status'] = cg.update(session['true_status'], ['GO'])
+                    opponent_response = get_best_peg_response(session['true_status'], 1)
+                    session['true_status'] = cg.update(session['true_status'], opponent_response)
+                session['legal_moves'] = find_legal_moves(session['true_status']['peg_count'],
+                                                            session['true_status']['hands'][0]
+                                                            )
 
-        if session['true_status']['phase'] == 'Pegging Complete':
+            if session['true_status']['phase'] == 'Pegging Complete':
+                session['legal_moves'] = 'null'
+
+        elif session['true_status']['phase'] == 'Pegging Complete':
             session['legal_moves'] = 'null'
+            session['true_status'] = cg.update(session['true_status'])
+            obscure_hand = False
+        elif session['true_status']['phase'] == 'Round Complete':
+            session['legal_moves'] = 'null'
+            session['true_status'] = cg.update(session['true_status'])
+            session['move_scores'] = find_best_hand_combination(session['true_status']['hands'][0], session['true_status']['dealer'], return_all=True)
+            obscure_hand = False
+            save = True
+        elif session['true_status']['phase'] == 'Game Over':
+            print "game over logged into db"
+            iswin = max(session['true_status']['scores']) == session['true_status']['scores'][0]
+            usr = Users.query.filter_by(u_id=user_id).first()
+            usr.add_game(iswin)
+            db.session.add(usr)
+            db.session.commit()
+            return redirect(url_for('reset'))
 
-    elif session['true_status']['phase'] == 'Pegging Complete':
-        session['legal_moves'] = 'null'
-        session['true_status'] = cg.update(session['true_status'])
-        obscure_hand = False
-    elif session['true_status']['phase'] == 'Round Complete':
-        session['legal_moves'] = 'null'
-        session['true_status'] = cg.update(session['true_status'])
-        session['move_scores'] = find_best_hand_combination(session['true_status']['hands'][0], session['true_status']['dealer'], return_all=True)
-        obscure_hand = False
-        save = True
-    elif session['true_status']['phase'] == 'Game Over':
-        print "game over logged into db"
-        iswin = max(session['true_status']['scores']) == session['true_status']['scores'][0]
-        usr = Users.query.filter_by(u_id=user_id).first()
-        usr.add_game(iswin)
-        db.session.add(usr)
-        db.session.commit()
+
+        game_status = deepcopy(session['true_status'])
+        if obscure_hand == True:
+            game_status['hands'][1] = ["BB"] * len(game_status['hands'][1])
+        if session['true_status']['faceup'] is not None:
+            game_status['faceup'] = lookup_cards([game_status['faceup']])
+        else:
+            game_status['faceup'] = lookup_cards(['BB'])
+        if session['true_status']['phase'] == 'Round Complete':
+            #we render kitty where phist is for dealer
+            dealer = game_status['dealer']
+            game_status['peg_phist'][str(dealer)] = game_status['kitty']
+
+        game_status['hands'] = [lookup_cards(hand) for hand in game_status['hands']]
+        game_status['peg_hist']= [lookup_cards([hand]) for hand in game_status['peg_hist']]
+        game_status['peg_phist'] = {key:lookup_cards(val) for key,val in game_status['peg_phist'].iteritems()}
+        session['game_status'] = game_status
+        logging.info({'u_id':user_id, 'log':session['true_status']})
+
+        return redirect(url_for('crib'))
+    except:
         return redirect(url_for('reset'))
-
-
-    game_status = deepcopy(session['true_status'])
-    if obscure_hand == True:
-        game_status['hands'][1] = ["BB"] * len(game_status['hands'][1])
-    if session['true_status']['faceup'] is not None:
-        game_status['faceup'] = lookup_cards([game_status['faceup']])
-    else:
-        game_status['faceup'] = lookup_cards(['BB'])
-    if session['true_status']['phase'] == 'Round Complete':
-        #we render kitty where phist is for dealer
-        dealer = game_status['dealer']
-        game_status['peg_phist'][str(dealer)] = game_status['kitty']
-
-    game_status['hands'] = [lookup_cards(hand) for hand in game_status['hands']]
-    game_status['peg_hist']= [lookup_cards([hand]) for hand in game_status['peg_hist']]
-    game_status['peg_phist'] = {key:lookup_cards(val) for key,val in game_status['peg_phist'].iteritems()}
-    session['game_status'] = game_status
-    logging.info({'u_id':user_id, 'log':session['true_status']})
-
-    return redirect(url_for('crib'))
 
 
 @app.route('/crib', methods=['GET'])
