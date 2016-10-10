@@ -7,7 +7,7 @@ testapp:
 generate:
 	# Generate fake data and store them as log files.  On every move, each
 	# choice is a random choice of legal moves
-	seq 100 | xargs -Iz python models/generate_data.py True
+	seq 10 | xargs -Iz python models/generate_data.py True
 	python models/parse_logs.py True
 
 generate_modeled:
@@ -17,10 +17,10 @@ generate_modeled:
 clean:
 	rm -rf data/logs*
 	rm -f data/*base_table.txt
-	mkdir data
-	mkdir data/logs
-	mkdir data/logs/random
-	mkdir data/logs/model
+	mkdir -p data
+	mkdir -p data/logs
+	mkdir -p data/logs/random
+	mkdir -p data/logs/model
 	find . -name \*.pyc -delete
 
 model:
