@@ -19,5 +19,6 @@ install:
 # command to run tests
 script:
   - pwd
-  - cd crib 
+  - python -c "import sys; print sys.path"
+  - python -c "import sys, os; sys.path.append(os.getcwd())"
   - make test
