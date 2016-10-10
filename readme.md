@@ -2,7 +2,7 @@
 #### Cribbage AI and Tool for Improving Cribbage Game
 ---
 
-[CribbageCoach Live Site](http://www.cribbagecoach.com)
+[CribbageCoach Live Site](http://www.cribbagecoach.com/reset)
 
 [Project Write-Up](http://www.cribbagecoach.com/blog)
 
