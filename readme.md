@@ -22,8 +22,8 @@ make testapp
 
 ### Overview:
 CribbageCoach consists of 3 parts
-* Stateless API with Cribbage Logic Built in (gameplay)
-* Machine Learning Models w/ artificial (models)
+* Stateless API with Cribbage Logic (gameplay)
+* Machine Learning Models w/ artificial game generation and log parsing (models)
 * Frontend Flask Application (app)
 
 If you wish to use this application to run your own experiments, see the
