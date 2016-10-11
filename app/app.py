@@ -218,13 +218,13 @@ def crib():
 @app.route('/')
 @app.route('/reset', methods=['GET'])
 def reset():
-    if 'user_id' in session:
+    try:
         user_id = deepcopy(session['user_id'])
         session.clear()
         session['user_id'] = user_id
         active_user = Users.query.filter(Users.u_id == session['user_id']).first()
         session['user_wl'] = [active_user.games_won, active_user.games_lost]
-    else:
+    except:
         session['user_wl'] = [0,0]
 
 

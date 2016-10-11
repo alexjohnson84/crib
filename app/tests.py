@@ -19,8 +19,8 @@ class VisitorTest(unittest.TestCase):
         """
         self.browser = webdriver.Firefox()
         self.browser.get_cookies()
-        self.browser.get('http://127.0.0.1:5000/reset')
-        # self.browser.get('http://www.cribbagecoach.com')
+        # self.browser.get('http://127.0.0.1:5000/reset')
+        self.browser.get('http://www.cribbagecoach.com')
 
     def tearDown(self):
         """
@@ -116,13 +116,13 @@ class VisitorTest(unittest.TestCase):
             else:
                 self.submitpage()
 
-    @unittest.skip('skipping multiple games')
     def test_single_game(self):
         """
         Run a single game, currently tests the title renders on each page
         """
         self.single_game()
 
+    @unittest.skip('skipping multiple games')
     def test_multiple_games(self, n=5):
         """
         Run multiple games.  Needs testing added to make sure the user log data
